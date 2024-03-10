@@ -31,30 +31,36 @@ class CropSuggestionWidget extends StatelessWidget {
     }
 
     // Humidity-based suggestions
-    if (humidity! > 60) {
-      suggestedCrops.addAll(['Rice', 'Bananas', 'Papayas']);
-    } else if (humidity! < 30) {
-      suggestedCrops.addAll(['Cactus', 'Aloe Vera']);
+    if (humidity != null) {
+      if (humidity! > 80) {
+        suggestedCrops.addAll(['Rice', 'Bananas', 'Papayas']);
+      } else if (humidity! > 60) {
+        suggestedCrops.addAll(['Oranges', 'Mangoes', 'Pineapples']);
+      } else if (humidity! < 40) {
+        suggestedCrops.addAll(['Apples', 'Grapes', 'Peaches']);
+      }
     }
 
     // Precipitation-based suggestions
-    if (precipitationType == 'rain') {
-      if (precipitationAmount! > 20) {
-        suggestedCrops.addAll(['Rice', 'Wheat', 'Corn']);
-      }
-      if (temperature > 10 && temperature < 25) {
-        suggestedCrops.addAll(['Apples', 'Grapes', 'Peaches']);
-      }
-    } else if (precipitationType == 'snow') {
-      if (precipitationAmount! > 10) {
-        suggestedCrops.addAll(['Potatoes', 'Turnips', 'Beets']);
-      }
-      if (temperature < 5) {
-        suggestedCrops.add('Winter Wheat');
-      }
-    } else if (precipitationType == 'hail') {
-      if (precipitationAmount! > 5) {
-        suggestedCrops.add('Strawberries');
+    if (precipitationType != null && precipitationAmount != null) {
+      if (precipitationType == 'rain') {
+        if (precipitationAmount! > 20) {
+          suggestedCrops.addAll(['Rice', 'Wheat', 'Corn']);
+        }
+        if (temperature > 10 && temperature < 25) {
+          suggestedCrops.addAll(['Apples', 'Grapes', 'Peaches']);
+        }
+      } else if (precipitationType == 'snow') {
+        if (precipitationAmount! > 10) {
+          suggestedCrops.addAll(['Potatoes', 'Turnips', 'Beets']);
+        }
+        if (temperature < 5) {
+          suggestedCrops.add('Winter Wheat');
+        }
+      } else if (precipitationType == 'hail') {
+        if (precipitationAmount! > 5) {
+          suggestedCrops.add('Strawberries');
+        }
       }
     }
 
@@ -70,31 +76,41 @@ class CropSuggestionWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Suggested Crops',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Suggested Crops',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         SizedBox(height: 10),
-        if (crops.isNotEmpty)
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: crops.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(crops[index]),
-              );
-            },
-          )
-        else
-          Text(
-            'No crops suggested based on current weather data.',
-            style: TextStyle(
-              fontStyle: FontStyle.italic,
-            ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              SizedBox(width: 16), // Add some padding at the beginning
+              for (String crop in crops)
+                Container(
+                  margin: EdgeInsets.only(right: 8),
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    crop,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
           ),
+        ),
       ],
     );
   }
