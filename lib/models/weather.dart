@@ -13,7 +13,7 @@ class Weather {
   final double? visibility;
   final String? sunriseTime;
   final String? sunsetTime;
-  final String? time;
+  final DateTime? time;
   final String? locationName;
   final String? zone;
   final double? latitude; // Latitude property
@@ -21,7 +21,7 @@ class Weather {
 
   Weather({
     required this.temperature,
-    required this.feelsLikeTemperature,
+    this.feelsLikeTemperature,
     this.precipitationType,
     this.precipitationAmount,
     this.windSpeed,

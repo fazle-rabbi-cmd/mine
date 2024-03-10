@@ -73,4 +73,31 @@ class WeatherService {
       throw Exception('Failed to load hourly forecast');
     }
   }
+
+  Future<Weather> getHistoricalWeather(
+      double lat, double lon, DateTime date) async {
+    final baseUrl = 'https://api.weatherbit.io/v2.0';
+    final formattedDate =
+        '${date.year}-${_formatNumber(date.month)}-${_formatNumber(date.day)}';
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/history/hourly?lat=$lat&lon=$lon&start_date=$formattedDate&end_date=$formattedDate&key=$apiKey'),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final hourlyData = data['data'] as List;
+      if (hourlyData.isNotEmpty) {
+        return Weather.fromJson(hourlyData[0]);
+      } else {
+        throw Exception(
+            'No historical weather data available for the specified date.');
+      }
+    } else {
+      throw Exception('Failed to load historical weather data');
+    }
+  }
+
+  String _formatNumber(int number) {
+    return number.toString().padLeft(2, '0');
+  }
 }
