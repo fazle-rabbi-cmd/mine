@@ -42,77 +42,88 @@ class SearchDialog extends StatefulWidget {
 class _SearchDialogState extends State<SearchDialog> {
   final TextEditingController _searchController = TextEditingController();
   String? _tempLocationName;
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: 'Enter location name',
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.all(12.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Enter location name',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.all(12.0),
+              errorText: _error,
+            ),
+            onChanged: (value) {
+              setState(() {
+                _tempLocationName = value;
+                _error = null; // Clear error when user starts typing
+              });
+            },
+            onSubmitted: _searchLocation,
           ),
-          onChanged: (value) {
-            setState(() {
-              _tempLocationName = value;
-            });
-          },
-          onSubmitted: _searchLocation,
-        ),
-        SizedBox(height: 12.0),
-        ElevatedButton(
-          onPressed: () {
-            _searchLocation(_searchController.text);
-          },
-          child: Text('Search'),
-        ),
-        SizedBox(height: 8.0),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Cancel'),
-        ),
-        SizedBox(height: 8.0),
-        TextButton(
-          onPressed: _setCurrentLocation,
-          child: Text('Use Current Location'),
-        ),
-      ],
+          SizedBox(height: 12.0),
+          ElevatedButton.icon(
+            onPressed: () => _searchLocation(_searchController.text),
+            icon: Icon(Icons.search),
+            label: Text('Search'),
+          ),
+          SizedBox(height: 8.0),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+          SizedBox(height: 8.0),
+          TextButton(
+            onPressed: _setCurrentLocation,
+            child: Text('Use Current Location'),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _searchLocation(String value) async {
-    if (value.isNotEmpty) {
-      final weatherService = WeatherService(widget.apiKey);
+    if (value.trim().isEmpty) {
+      setState(() {
+        _error = 'Please enter a location name';
+      });
+      return;
+    }
 
-      try {
-        final weatherData =
-            await weatherService.getWeatherByLocationName(value);
-        final dailyForecastData = await weatherService.getDailyForecast(
-          weatherData.latitude ?? 0.0,
-          weatherData.longitude ?? 0.0,
-        );
-        final hourlyForecastData = await weatherService.getHourlyForecast(
-          weatherData.latitude ?? 0.0,
-          weatherData.longitude ?? 0.0,
-        );
+    final weatherService = WeatherService(widget.apiKey);
 
-        widget.updateWeather(
-          weatherData,
-          dailyForecastData,
-          hourlyForecastData,
-          value,
-        );
+    try {
+      final weatherData = await weatherService.getWeatherByLocationName(value);
+      final dailyForecastData = await weatherService.getDailyForecast(
+        weatherData.latitude ?? 0.0,
+        weatherData.longitude ?? 0.0,
+      );
+      final hourlyForecastData = await weatherService.getHourlyForecast(
+        weatherData.latitude ?? 0.0,
+        weatherData.longitude ?? 0.0,
+      );
 
-        Navigator.of(context).pop();
-      } catch (e) {
-        print('Error fetching weather data: $e');
-      }
+      widget.updateWeather(
+        weatherData,
+        dailyForecastData,
+        hourlyForecastData,
+        value,
+      );
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      setState(() {
+        _error = 'Error fetching weather data';
+      });
+      print('Error fetching weather data: $e');
     }
   }
 
@@ -140,6 +151,9 @@ class _SearchDialogState extends State<SearchDialog> {
 
       Navigator.of(context).pop();
     } catch (e) {
+      setState(() {
+        _error = 'Error fetching weather data';
+      });
       print('Error fetching weather data: $e');
     }
   }
