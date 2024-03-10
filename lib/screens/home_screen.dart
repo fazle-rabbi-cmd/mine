@@ -6,6 +6,8 @@ import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
 
+import '../widgets/search_dialogue.dart'; // Import the search dialog
+
 class HomeScreen extends StatefulWidget {
   final String apiKey;
 
@@ -76,104 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Method to show the search dialog
-  Future<void> _showSearchDialog() async {
-    TextEditingController searchController = TextEditingController();
-    String? tempLocationName;
-
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Search Location'),
-          content: TextField(
-            controller: searchController,
-            decoration: InputDecoration(hintText: 'Enter location name'),
-            onChanged: (value) {
-              tempLocationName = value;
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Search'),
-              onPressed: () async {
-                if (tempLocationName != null && tempLocationName!.isNotEmpty) {
-                  final weatherService = WeatherService(widget.apiKey);
-
-                  // Fetch data using the entered location name
-                  try {
-                    final weatherData = await weatherService
-                        .getWeatherByLocationName(tempLocationName!);
-                    final dailyForecastData =
-                        await weatherService.getDailyForecast(
-                            weatherData.latitude ?? 0.0,
-                            weatherData.longitude ?? 0.0);
-                    final hourlyForecastData =
-                        await weatherService.getHourlyForecast(
-                            weatherData.latitude ?? 0.0,
-                            weatherData.longitude ?? 0.0);
-
-                    setState(() {
-                      currentWeather = weatherData;
-                      dailyForecast = dailyForecastData;
-                      hourlyForecast = hourlyForecastData;
-                      locationName = tempLocationName!;
-                    });
-                  } catch (e) {
-                    print('Error fetching weather data: $e');
-                  }
-
-                  // Close the dialog
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Set Current Location'),
-              onPressed: () async {
-                final locationService = LocationService();
-                final weatherService = WeatherService(widget.apiKey);
-
-                try {
-                  final position = await locationService.getCurrentLocation();
-                  final lat = position.latitude;
-                  final lon = position.longitude;
-
-                  // Fetch data using the current location
-                  final currentWeatherData =
-                      await weatherService.getCurrentWeather(lat, lon);
-                  final dailyForecastData =
-                      await weatherService.getDailyForecast(lat, lon);
-                  final hourlyForecastData =
-                      await weatherService.getHourlyForecast(lat, lon);
-
-                  setState(() {
-                    currentWeather = currentWeatherData;
-                    dailyForecast = dailyForecastData;
-                    hourlyForecast = hourlyForecastData;
-                    locationName =
-                        currentWeatherData.locationName!; // Update locationName
-                  });
-                } catch (e) {
-                  print('Error fetching weather data: $e');
-                }
-
-                // Close the dialog
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // Method to show the date picker dialog
   Future<void> _showDatePickerDialog() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -196,7 +100,17 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              _showSearchDialog();
+              showSearchDialog(context, widget.apiKey, (Weather weather,
+                  List<Weather> dailyForecast,
+                  List<Weather> hourlyForecast,
+                  String locationName) {
+                setState(() {
+                  currentWeather = weather;
+                  this.dailyForecast = dailyForecast;
+                  this.hourlyForecast = hourlyForecast;
+                  this.locationName = locationName;
+                });
+              });
             },
           ),
           IconButton(
