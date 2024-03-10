@@ -18,6 +18,7 @@ class Weather {
   final String? zone;
   final double? latitude; // Latitude property
   final double? longitude; // Longitude property
+  final double? soilMoisture; // Soil moisture property
 
   Weather({
     required this.temperature,
@@ -39,6 +40,7 @@ class Weather {
     this.zone,
     this.latitude, // Include latitude in the constructor
     this.longitude, // Include longitude in the constructor
+    this.soilMoisture, // Include soil moisture in the constructor
   });
 
   static Weather fromJson(Map<String, dynamic> data) {
@@ -61,6 +63,7 @@ class Weather {
       zone: data['timezone'] ?? '',
       latitude: data['lat'] ?? 0.0, // Assign latitude value
       longitude: data['lon'] ?? 0.0, // Assign longitude value
+      soilMoisture: data['soil_moisture'] ?? 0.0, // Assign soil moisture value
       // time: DateTime.parse(data['time']), // Parse time from data,
     );
   }
