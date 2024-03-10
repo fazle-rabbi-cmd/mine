@@ -7,6 +7,7 @@ import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
 
 import '../widgets/search_dialogue.dart'; // Import the search dialog
+import '../widgets/date_picker_dialogue.dart'; // Import the date picker dialog
 
 class HomeScreen extends StatefulWidget {
   final String apiKey;
@@ -80,15 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Method to show the date picker dialog
   Future<void> _showDatePickerDialog() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-    if (pickedDate != null) {
-      // Handle selected date
-    }
+    showDatePickerDialog(context); // Call the function from the new file
   }
 
   @override
