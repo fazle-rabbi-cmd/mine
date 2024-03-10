@@ -5,6 +5,7 @@ import 'package:mine/services/weather_service.dart';
 import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
+import '../widgets/recommendation_widget.dart';
 
 import '../widgets/crop_suggestions_widget.dart';
 import '../widgets/search_dialogue.dart'; // Import the search dialog
@@ -137,6 +138,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showRecommendation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Recommendations'),
+          content: RecommendationWidget(
+            airQualityIndex: currentWeather.aqi?.toDouble() ?? 0,
+            uvIndex: currentWeather.uvIndex?.toDouble() ?? 0,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,6 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.calendar_today),
             onPressed: () {
               _showDatePickerDialog();
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.info),
+            onPressed: () {
+              _showRecommendation(
+                  context); // Call the method to show recommendations
             },
           ),
         ],
