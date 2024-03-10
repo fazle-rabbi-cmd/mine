@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              showSearchDialog(context, widget.apiKey, (Weather weather,
+              showSearchScreen(context, widget.apiKey, (Weather weather,
                   List<Weather> dailyForecast,
                   List<Weather> hourlyForecast,
                   String locationName) {

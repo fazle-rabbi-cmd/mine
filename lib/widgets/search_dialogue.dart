@@ -3,123 +3,148 @@ import 'package:mine/models/weather.dart';
 import 'package:mine/services/weather_service.dart';
 import 'package:mine/services/location_service.dart';
 
-Future<void> showSearchDialog(
-    BuildContext context,
-    String apiKey,
-    Function(Weather, List<Weather>, List<Weather>, String)
-        updateWeather) async {
-  TextEditingController searchController = TextEditingController();
-  String? tempLocationName;
+class SearchScreen extends StatelessWidget {
+  final String apiKey;
+  final Function(Weather, List<Weather>, List<Weather>, String) updateWeather;
 
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
+  SearchScreen({
+    required this.apiKey,
+    required this.updateWeather,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
         title: Text('Search Location'),
-        content: Form(
-          child: TextFormField(
-            controller: searchController,
-            decoration: InputDecoration(hintText: 'Enter location name'),
-            onChanged: (value) {
-              tempLocationName = value;
-            },
-            onFieldSubmitted: (value) async {
-              if (tempLocationName != null && tempLocationName!.isNotEmpty) {
-                final weatherService = WeatherService(apiKey);
+      ),
+      body: SearchDialog(apiKey: apiKey, updateWeather: updateWeather),
+    );
+  }
+}
 
-                // Fetch data using the entered location name
-                try {
-                  final weatherData = await weatherService
-                      .getWeatherByLocationName(tempLocationName!);
-                  final dailyForecastData =
-                      await weatherService.getDailyForecast(
-                          weatherData.latitude ?? 0.0,
-                          weatherData.longitude ?? 0.0);
-                  final hourlyForecastData =
-                      await weatherService.getHourlyForecast(
-                          weatherData.latitude ?? 0.0,
-                          weatherData.longitude ?? 0.0);
+class SearchDialog extends StatefulWidget {
+  final String apiKey;
+  final Function(Weather, List<Weather>, List<Weather>, String) updateWeather;
 
-                  updateWeather(weatherData, dailyForecastData,
-                      hourlyForecastData, tempLocationName!);
-                } catch (e) {
-                  print('Error fetching weather data: $e');
-                }
+  SearchDialog({
+    required this.apiKey,
+    required this.updateWeather,
+  });
 
-                // Close the dialog
-                Navigator.of(context).pop();
-              }
-            },
-          ),
+  @override
+  _SearchDialogState createState() => _SearchDialogState();
+}
+
+class _SearchDialogState extends State<SearchDialog> {
+  final TextEditingController _searchController = TextEditingController();
+  String? _tempLocationName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextFormField(
+          controller: _searchController,
+          decoration: InputDecoration(hintText: 'Enter location name'),
+          onChanged: (value) {
+            setState(() {
+              _tempLocationName = value;
+            });
+          },
+          onFieldSubmitted: _searchLocation,
         ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Search'),
-            onPressed: () async {
-              if (tempLocationName != null && tempLocationName!.isNotEmpty) {
-                final weatherService = WeatherService(apiKey);
+        ElevatedButton(
+          onPressed: () {
+            _searchLocation(_searchController.text);
+          },
+          child: Text('Search'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _setCurrentLocation,
+          child: Text('Set Current Location'),
+        ),
+      ],
+    );
+  }
 
-                // Fetch data using the entered location name
-                try {
-                  final weatherData = await weatherService
-                      .getWeatherByLocationName(tempLocationName!);
-                  final dailyForecastData =
-                      await weatherService.getDailyForecast(
-                          weatherData.latitude ?? 0.0,
-                          weatherData.longitude ?? 0.0);
-                  final hourlyForecastData =
-                      await weatherService.getHourlyForecast(
-                          weatherData.latitude ?? 0.0,
-                          weatherData.longitude ?? 0.0);
+  Future<void> _searchLocation(String value) async {
+    if (value.isNotEmpty) {
+      final weatherService = WeatherService(widget.apiKey);
 
-                  updateWeather(weatherData, dailyForecastData,
-                      hourlyForecastData, tempLocationName!);
-                } catch (e) {
-                  print('Error fetching weather data: $e');
-                }
+      try {
+        final weatherData =
+            await weatherService.getWeatherByLocationName(value);
+        final dailyForecastData = await weatherService.getDailyForecast(
+          weatherData.latitude ?? 0.0,
+          weatherData.longitude ?? 0.0,
+        );
+        final hourlyForecastData = await weatherService.getHourlyForecast(
+          weatherData.latitude ?? 0.0,
+          weatherData.longitude ?? 0.0,
+        );
 
-                // Close the dialog
-                Navigator.of(context).pop();
-              }
-            },
-          ),
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: Text('Set Current Location'),
-            onPressed: () async {
-              final locationService = LocationService();
-              final weatherService = WeatherService(apiKey);
+        widget.updateWeather(
+          weatherData,
+          dailyForecastData,
+          hourlyForecastData,
+          value,
+        );
 
-              try {
-                final position = await locationService.getCurrentLocation();
-                final lat = position.latitude;
-                final lon = position.longitude;
+        Navigator.of(context).pop();
+      } catch (e) {
+        print('Error fetching weather data: $e');
+      }
+    }
+  }
 
-                // Fetch data using the current location
-                final currentWeatherData =
-                    await weatherService.getCurrentWeather(lat, lon);
-                final dailyForecastData =
-                    await weatherService.getDailyForecast(lat, lon);
-                final hourlyForecastData =
-                    await weatherService.getHourlyForecast(lat, lon);
+  Future<void> _setCurrentLocation() async {
+    final locationService = LocationService();
+    final weatherService = WeatherService(widget.apiKey);
 
-                updateWeather(currentWeatherData, dailyForecastData,
-                    hourlyForecastData, currentWeatherData.locationName!);
-              } catch (e) {
-                print('Error fetching weather data: $e');
-              }
+    try {
+      final position = await locationService.getCurrentLocation();
+      final lat = position.latitude;
+      final lon = position.longitude;
 
-              // Close the dialog
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
+      final currentWeatherData =
+          await weatherService.getCurrentWeather(lat, lon);
+      final dailyForecastData = await weatherService.getDailyForecast(lat, lon);
+      final hourlyForecastData =
+          await weatherService.getHourlyForecast(lat, lon);
+
+      widget.updateWeather(
+        currentWeatherData,
+        dailyForecastData,
+        hourlyForecastData,
+        currentWeatherData.locationName!,
       );
-    },
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      print('Error fetching weather data: $e');
+    }
+  }
+}
+
+Future<void> showSearchScreen(
+  BuildContext context,
+  String apiKey,
+  Function(Weather, List<Weather>, List<Weather>, String) updateWeather,
+) async {
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => SearchScreen(
+        apiKey: apiKey,
+        updateWeather: updateWeather,
+      ),
+    ),
   );
 }
