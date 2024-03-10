@@ -76,28 +76,48 @@ class WeatherService {
 
   Future<Weather> getHistoricalWeather(
       double lat, double lon, DateTime date) async {
-    final baseUrl = 'https://api.weatherbit.io/v2.0';
-    final formattedDate =
-        '${date.year}-${_formatNumber(date.month)}-${_formatNumber(date.day)}';
-    final response = await http.get(
-      Uri.parse(
-          '$baseUrl/history/hourly?lat=$lat&lon=$lon&start_date=$formattedDate&end_date=$formattedDate&key=$apiKey'),
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final hourlyData = data['data'] as List;
-      if (hourlyData.isNotEmpty) {
-        return Weather.fromJson(hourlyData[0]);
+    try {
+      final baseUrl = 'https://api.weatherbit.io/v2.0';
+      final formattedDate =
+          '${date.year}-${_formatNumber(date.month)}-${_formatNumber(date.day)}';
+      final response = await http.get(
+        Uri.parse(
+            '$baseUrl/history/hourly?lat=$lat&lon=$lon&start_date=$formattedDate&end_date=$formattedDate&key=$apiKey'),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final hourlyData = data['data'] as List;
+        if (hourlyData.isNotEmpty) {
+          return Weather.fromJson(hourlyData[0]);
+        } else {
+          throw Exception(
+              'No historical weather data available for the specified date.');
+        }
       } else {
         throw Exception(
-            'No historical weather data available for the specified date.');
+            'Failed to load historical weather data. Status code: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Failed to load historical weather data');
+    } catch (e) {
+      print('Error fetching historical weather data: $e');
+      rethrow;
     }
   }
 
   String _formatNumber(int number) {
     return number.toString().padLeft(2, '0');
+  }
+
+  Future<Weather> getWeatherForDate(
+      double lat, double lon, DateTime selectedDate) async {
+    final weatherService = WeatherService(apiKey);
+    try {
+      // Fetch historical weather data for the specified date
+      final historicalWeather =
+          await weatherService.getHistoricalWeather(lat, lon, selectedDate);
+      return historicalWeather;
+    } catch (e) {
+      print('Error fetching weather data for date: $e');
+      rethrow; // Rethrow the exception for error handling in the UI
+    }
   }
 }

@@ -79,9 +79,35 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Method to fetch weather data for the selected date
+  Future<void> fetchWeatherDataForDate(DateTime selectedDate) async {
+    try {
+      final locationService = LocationService();
+      final weatherService = WeatherService(widget.apiKey);
+
+      final position = await locationService.getCurrentLocation();
+      final lat = position.latitude;
+      final lon = position.longitude;
+
+      // Fetch weather data for the selected date
+      final weatherData =
+          await weatherService.getWeatherForDate(lat, lon, selectedDate);
+      // Update UI with weather data for the selected date
+      setState(() {
+        currentWeather = weatherData;
+        locationName = weatherData.locationName!;
+      });
+    } catch (e) {
+      print('Error fetching weather data: $e');
+    }
+  }
+
   // Method to show the date picker dialog
   Future<void> _showDatePickerDialog() async {
-    showDatePickerDialog(context); // Call the function from the new file
+    showDatePickerDialog(context, (DateTime selectedDate) {
+      // Handle selected date here
+      fetchWeatherDataForDate(selectedDate);
+    });
   }
 
   @override

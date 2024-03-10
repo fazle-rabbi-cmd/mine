@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-Future<void> showDatePickerDialog(BuildContext context) async {
+typedef DateCallback = void Function(DateTime selectedDate);
+
+Future<void> showDatePickerDialog(
+    BuildContext context, DateCallback onDateSelected) async {
   final DateTime? pickedDate = await showDatePicker(
     context: context,
     initialDate: DateTime.now(),
@@ -8,6 +11,7 @@ Future<void> showDatePickerDialog(BuildContext context) async {
     lastDate: DateTime.now(),
   );
   if (pickedDate != null) {
-    // Handle selected date
+    onDateSelected(
+        pickedDate); // Call the callback function with the selected date
   }
 }
