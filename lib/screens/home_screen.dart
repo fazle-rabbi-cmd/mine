@@ -6,6 +6,7 @@ import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
 
+import '../widgets/crop_suggestions_widget.dart';
 import '../widgets/search_dialogue.dart'; // Import the search dialog
 import '../widgets/date_picker_dialogue.dart'; // Import the date picker dialog
 
@@ -140,6 +141,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      // Add a drawer with options like settings and feedback
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                // Navigate to settings screen or perform necessary actions
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.feedback),
+              title: Text('Feedback'),
+              onTap: () {
+                // Navigate to feedback screen or perform necessary actions
+              },
+            ),
+            // Add more options as needed
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -150,6 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 currentWeather: currentWeather,
                 locationName: locationName, // Pass locationName
               ),
+              SizedBox(height: 20),
+              CropSuggestionsWidget(),
               SizedBox(height: 20),
               HourlyForecastWidget(hourlyForecast: hourlyForecast),
               SizedBox(height: 20),
