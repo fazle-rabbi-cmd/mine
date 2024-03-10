@@ -16,6 +16,8 @@ class Weather {
   final String? time;
   final String? locationName;
   final String? zone;
+  final double? latitude; // Latitude property
+  final double? longitude; // Longitude property
 
   Weather({
     required this.temperature,
@@ -35,6 +37,8 @@ class Weather {
     this.time,
     this.locationName,
     this.zone,
+    this.latitude, // Include latitude in the constructor
+    this.longitude, // Include longitude in the constructor
   });
 
   static Weather fromJson(Map<String, dynamic> data) {
@@ -55,6 +59,8 @@ class Weather {
       sunsetTime: data['sunset'] ?? '',
       locationName: data['city_name'] ?? '',
       zone: data['timezone'] ?? '',
+      latitude: data['lat'] ?? 0.0, // Assign latitude value
+      longitude: data['lon'] ?? 0.0, // Assign longitude value
     );
   }
 }

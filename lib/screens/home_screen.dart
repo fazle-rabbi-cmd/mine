@@ -96,9 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   try {
                     final weatherData = await weatherService
                         .getWeatherByLocationName(tempLocationName!);
+                    final dailyForecastData =
+                        await weatherService.getDailyForecast(
+                            weatherData.latitude ?? 0.0,
+                            weatherData.longitude ?? 0.0);
+
                     setState(() {
                       currentWeather = weatherData;
-                      locationName = tempLocationName!; // Update locationName
+                      dailyForecast = dailyForecastData;
+                      locationName = tempLocationName!;
                     });
                   } catch (e) {
                     print('Error fetching weather data: $e');
@@ -129,8 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Fetch data using the current location
                   final currentWeatherData =
                       await weatherService.getCurrentWeather(lat, lon);
+                  final dailyForecastData =
+                      await weatherService.getDailyForecast(lat, lon);
+
                   setState(() {
                     currentWeather = currentWeatherData;
+                    dailyForecast = dailyForecastData;
                   });
                 } catch (e) {
                   print('Error fetching weather data: $e');
