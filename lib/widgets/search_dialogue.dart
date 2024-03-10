@@ -16,12 +16,41 @@ Future<void> showSearchDialog(
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Search Location'),
-        content: TextField(
-          controller: searchController,
-          decoration: InputDecoration(hintText: 'Enter location name'),
-          onChanged: (value) {
-            tempLocationName = value;
-          },
+        content: Form(
+          child: TextFormField(
+            controller: searchController,
+            decoration: InputDecoration(hintText: 'Enter location name'),
+            onChanged: (value) {
+              tempLocationName = value;
+            },
+            onFieldSubmitted: (value) async {
+              if (tempLocationName != null && tempLocationName!.isNotEmpty) {
+                final weatherService = WeatherService(apiKey);
+
+                // Fetch data using the entered location name
+                try {
+                  final weatherData = await weatherService
+                      .getWeatherByLocationName(tempLocationName!);
+                  final dailyForecastData =
+                      await weatherService.getDailyForecast(
+                          weatherData.latitude ?? 0.0,
+                          weatherData.longitude ?? 0.0);
+                  final hourlyForecastData =
+                      await weatherService.getHourlyForecast(
+                          weatherData.latitude ?? 0.0,
+                          weatherData.longitude ?? 0.0);
+
+                  updateWeather(weatherData, dailyForecastData,
+                      hourlyForecastData, tempLocationName!);
+                } catch (e) {
+                  print('Error fetching weather data: $e');
+                }
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              }
+            },
+          ),
         ),
         actions: <Widget>[
           TextButton(
