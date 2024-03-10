@@ -1,123 +1,100 @@
-// import 'package:flutter/material.dart';
-//
-// class CropSuggestionsWidget extends StatelessWidget {
-//   List<String> getCropSuggestions() {
-//     // Define your logic to determine crop suggestions without weather conditions
-//     // You can base this on factors like seasonality, location, or general preferences
-//     // For demonstration purposes, we'll provide some generic suggestions
-//     return ['Tomatoes', 'Lettuce', 'Carrots', 'Bell Peppers'];
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     List<String> cropSuggestions = getCropSuggestions();
-//
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           'Crop Suggestions:',
-//           style: TextStyle(
-//             fontSize: 20,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//         SizedBox(height: 10),
-//         if (cropSuggestions.isNotEmpty)
-//           Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: cropSuggestions
-//                 .map((crop) => Text(
-//                       '- $crop',
-//                       style: TextStyle(fontSize: 16),
-//                     ))
-//                 .toList(),
-//           )
-//         else
-//           Text(
-//             'No crop suggestions available.',
-//             style: TextStyle(fontSize: 16),
-//           ),
-//         SizedBox(height: 20),
-//       ],
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 
-import '../models/agri_weather.dart'; // Import your AgriWeather model
+class CropSuggestionWidget extends StatelessWidget {
+  final double temperature;
+  final double? humidity;
+  final String? precipitationType;
+  final double? precipitationAmount;
 
-class CropSuggestionsWidget extends StatelessWidget {
-  final AgriWeather agriWeather;
+  CropSuggestionWidget({
+    required this.temperature,
+    this.humidity,
+    this.precipitationType,
+    this.precipitationAmount,
+  });
 
-  CropSuggestionsWidget({required this.agriWeather});
+  List<String> suggestCrops() {
+    List<String> suggestedCrops = [];
+
+    // Temperature-based suggestions
+    if (temperature >= 25 && temperature <= 35) {
+      suggestedCrops.addAll(['Tomatoes', 'Peppers', 'Cucumbers']);
+      if (temperature >= 28 && temperature <= 32) {
+        suggestedCrops.add('Bell Peppers');
+      }
+    } else if (temperature >= 20 && temperature < 25) {
+      suggestedCrops.addAll(['Lettuce', 'Spinach', 'Carrots']);
+    } else if (temperature > 35) {
+      suggestedCrops.addAll(['Cactus', 'Succulents']);
+    } else if (temperature < 10) {
+      suggestedCrops.addAll(['Cabbage', 'Broccoli', 'Kale']);
+    }
+
+    // Humidity-based suggestions
+    if (humidity! > 60) {
+      suggestedCrops.addAll(['Rice', 'Bananas', 'Papayas']);
+    } else if (humidity! < 30) {
+      suggestedCrops.addAll(['Cactus', 'Aloe Vera']);
+    }
+
+    // Precipitation-based suggestions
+    if (precipitationType == 'rain') {
+      if (precipitationAmount! > 20) {
+        suggestedCrops.addAll(['Rice', 'Wheat', 'Corn']);
+      }
+      if (temperature > 10 && temperature < 25) {
+        suggestedCrops.addAll(['Apples', 'Grapes', 'Peaches']);
+      }
+    } else if (precipitationType == 'snow') {
+      if (precipitationAmount! > 10) {
+        suggestedCrops.addAll(['Potatoes', 'Turnips', 'Beets']);
+      }
+      if (temperature < 5) {
+        suggestedCrops.add('Winter Wheat');
+      }
+    } else if (precipitationType == 'hail') {
+      if (precipitationAmount! > 5) {
+        suggestedCrops.add('Strawberries');
+      }
+    }
+
+    return suggestedCrops
+        .toSet()
+        .toList(); // Remove duplicates and convert back to list
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<String> crops = suggestCrops();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Agricultural Weather Data:',
+          'Suggested Crops',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 10),
-        Text(
-          'Skin Temperature: ${agriWeather.skinTemperature}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Average Temperature: ${agriWeather.averageTemperature}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Soil Temperature: ${agriWeather.soilTemperature}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Shortwave Solar Radiation: ${agriWeather.shortwaveSolarRadiation}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Longwave Solar Radiation: ${agriWeather.longwaveSolarRadiation}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Evapotranspiration: ${agriWeather.evapotranspiration}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Precipitation: ${agriWeather.precipitation}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Specific Humidity: ${agriWeather.specificHumidity}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Soil Moisture: ${agriWeather.soilMoisture}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Wind Speed: ${agriWeather.windSpeed}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Pressure: ${agriWeather.pressure}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Bulk Soil Density: ${agriWeather.bulkSoilDensity}',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(
-          'Volumetric Soil Moisture: ${agriWeather.volumetricSoilMoisture}',
-          style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(height: 20),
+        if (crops.isNotEmpty)
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: crops.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(crops[index]),
+              );
+            },
+          )
+        else
+          Text(
+            'No crops suggested based on current weather data.',
+            style: TextStyle(
+              fontStyle: FontStyle.italic,
+            ),
+          ),
       ],
     );
   }

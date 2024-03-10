@@ -22,4 +22,19 @@ class AgriWeatherService {
       throw Exception('Failed to load agricultural weather data');
     }
   }
+
+  Future<AgriWeather> fetchAgriWeatherByCityName(String cityName) async {
+    final baseUrl = 'https://api.weatherbit.io/v2.0/agweather/forecast/daily';
+    final url = '$baseUrl?key=$apiKey&city=$cityName';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final agriWeatherData = jsonData['data'][0]; // Assuming first day data
+      return AgriWeather.fromJson(agriWeatherData);
+    } else {
+      throw Exception('Failed to load agricultural weather data');
+    }
+  }
 }

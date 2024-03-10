@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mine/models/weather.dart';
-import 'package:mine/models/agri_weather.dart'; // Import AgriWeather model
 import 'package:mine/services/location_service.dart';
 import 'package:mine/services/weather_service.dart';
 import 'package:mine/widgets/current_weather_widget.dart';
@@ -114,23 +113,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Create an instance of AgriWeather with mock data
-    final agriWeather = AgriWeather(
-      skinTemperature: 25.5,
-      averageTemperature: 28.3,
-      soilTemperature: 20.1,
-      shortwaveSolarRadiation: 450,
-      longwaveSolarRadiation: 300,
-      evapotranspiration: 5.2,
-      precipitation: 10.5,
-      specificHumidity: 0.012,
-      soilMoisture: 0.35,
-      windSpeed: 8.2,
-      pressure: 1015,
-      bulkSoilDensity: 1.3,
-      volumetricSoilMoisture: 0.2,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Weather Forecast'),
@@ -205,8 +187,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 locationName: locationName, // Pass locationName
               ),
               SizedBox(height: 20),
-              CropSuggestionsWidget(
-                agriWeather: agriWeather, // Pass agriWeather instance
+              CropSuggestionWidget(
+                temperature: currentWeather.temperature,
+                humidity:
+                    double.tryParse(currentWeather.humidity.toString()) ?? 0,
+                precipitationType: currentWeather.precipitationType,
+                precipitationAmount: double.tryParse(
+                        currentWeather.precipitationAmount.toString()) ??
+                    0,
               ),
               SizedBox(height: 20),
               HourlyForecastWidget(hourlyForecast: hourlyForecast),
