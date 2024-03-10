@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     sunriseTime: '',
     sunsetTime: '',
     locationName: '',
+    time: DateTime.now(),
   );
 
   List<Weather> dailyForecast = [];

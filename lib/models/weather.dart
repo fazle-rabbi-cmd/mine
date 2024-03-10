@@ -61,6 +61,7 @@ class Weather {
       zone: data['timezone'] ?? '',
       latitude: data['lat'] ?? 0.0, // Assign latitude value
       longitude: data['lon'] ?? 0.0, // Assign longitude value
+      // time: DateTime.parse(data['time']), // Parse time from data,
     );
   }
 }
