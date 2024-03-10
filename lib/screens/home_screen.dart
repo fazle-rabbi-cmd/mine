@@ -111,6 +111,32 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Define the showSearchScreen method here
+  Future<void> showSearchScreen(
+      BuildContext context,
+      String apiKey,
+      Null Function(Weather weather, List<Weather> dailyForecast,
+              List<Weather> hourlyForecast, String locationName)
+          param2) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(
+          apiKey: widget.apiKey,
+          updateWeather: (Weather weather, List<Weather> dailyForecast,
+              List<Weather> hourlyForecast, String locationName) {
+            setState(() {
+              currentWeather = weather;
+              this.dailyForecast = dailyForecast;
+              this.hourlyForecast = hourlyForecast;
+              this.locationName = locationName;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

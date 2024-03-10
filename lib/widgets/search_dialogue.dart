@@ -18,7 +18,10 @@ class SearchScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Search Location'),
       ),
-      body: SearchDialog(apiKey: apiKey, updateWeather: updateWeather),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SearchDialog(apiKey: apiKey, updateWeather: updateWeather),
+      ),
     );
   }
 }
@@ -43,32 +46,41 @@ class _SearchDialogState extends State<SearchDialog> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TextFormField(
+        TextField(
           controller: _searchController,
-          decoration: InputDecoration(hintText: 'Enter location name'),
+          decoration: InputDecoration(
+            hintText: 'Enter location name',
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.all(12.0),
+          ),
           onChanged: (value) {
             setState(() {
               _tempLocationName = value;
             });
           },
-          onFieldSubmitted: _searchLocation,
+          onSubmitted: _searchLocation,
         ),
+        SizedBox(height: 12.0),
         ElevatedButton(
           onPressed: () {
             _searchLocation(_searchController.text);
           },
           child: Text('Search'),
         ),
-        ElevatedButton(
+        SizedBox(height: 8.0),
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           child: Text('Cancel'),
         ),
-        ElevatedButton(
+        SizedBox(height: 8.0),
+        TextButton(
           onPressed: _setCurrentLocation,
-          child: Text('Set Current Location'),
+          child: Text('Use Current Location'),
         ),
       ],
     );
@@ -131,20 +143,4 @@ class _SearchDialogState extends State<SearchDialog> {
       print('Error fetching weather data: $e');
     }
   }
-}
-
-Future<void> showSearchScreen(
-  BuildContext context,
-  String apiKey,
-  Function(Weather, List<Weather>, List<Weather>, String) updateWeather,
-) async {
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => SearchScreen(
-        apiKey: apiKey,
-        updateWeather: updateWeather,
-      ),
-    ),
-  );
 }
