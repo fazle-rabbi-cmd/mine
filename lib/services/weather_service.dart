@@ -54,7 +54,10 @@ class WeatherService {
     }
   }
 
-  Future<List<Weather>> getHourlyForecast(double lat, double lon) async {
+  Future<List<Weather>> getHourlyForecast(double? lat, double? lon) async {
+    if (lat == null || lon == null) {
+      throw Exception('Latitude and longitude must not be null.');
+    }
     final baseUrl = 'https://api.weatherbit.io/v2.0';
     final response = await http.get(
       Uri.parse('$baseUrl/forecast/hourly?lat=$lat&lon=$lon&key=$apiKey'),

@@ -100,10 +100,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         await weatherService.getDailyForecast(
                             weatherData.latitude ?? 0.0,
                             weatherData.longitude ?? 0.0);
+                    final hourlyForecastData =
+                        await weatherService.getHourlyForecast(
+                            weatherData.latitude ?? 0.0,
+                            weatherData.longitude ?? 0.0);
 
                     setState(() {
                       currentWeather = weatherData;
                       dailyForecast = dailyForecastData;
+                      hourlyForecast = hourlyForecastData;
                       locationName = tempLocationName!;
                     });
                   } catch (e) {
