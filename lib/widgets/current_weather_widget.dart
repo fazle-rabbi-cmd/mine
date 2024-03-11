@@ -120,7 +120,7 @@ class CurrentWeatherWidget extends StatelessWidget {
             'Feels Like',
             currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
             '°C',
-            Icons.thermostat_outlined,
+            Icons.thermostat_rounded,
             Colors.orange,
           ),
           _buildWeatherInfo(

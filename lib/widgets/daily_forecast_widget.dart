@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mine/models/weather.dart';
 
-class DailyForecastWidget extends StatelessWidget {
+class DailyForecastWidget extends StatefulWidget {
   final List<Weather> dailyForecast;
 
   const DailyForecastWidget({
@@ -10,7 +10,17 @@ class DailyForecastWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _DailyForecastWidgetState createState() => _DailyForecastWidgetState();
+}
+
+class _DailyForecastWidgetState extends State<DailyForecastWidget> {
+  bool _isCelsius = true;
+
+  @override
   Widget build(BuildContext context) {
+    final IconData defaultIcon = Icons.thermostat_rounded;
+    final Color defaultBoxColor = Colors.lightBlue[100]!;
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -28,115 +38,138 @@ class DailyForecastWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Daily Forecast',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Daily Forecast',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.swap_horiz),
+                onPressed: () {
+                  setState(() {
+                    _isCelsius = !_isCelsius;
+                  });
+                },
+              ),
+            ],
           ),
           SizedBox(height: 16),
-          Container(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: dailyForecast.length,
-              itemBuilder: (context, index) {
-                final weather = dailyForecast[index];
-                return Container(
-                  width: MediaQuery.of(context).size.width * 0.2,
-                  padding: EdgeInsets.all(16),
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Day ${index + 1}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.blue,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                widget.dailyForecast.length,
+                (index) {
+                  final weather = widget.dailyForecast[index];
+                  final forecastDate =
+                      DateTime.now().add(Duration(days: index));
+
+                  return Container(
+                    width: MediaQuery.of(context).size.width * 0.25,
+                    padding: EdgeInsets.all(16),
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: defaultBoxColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 2),
                         ),
-                      ),
-                      SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            Icons.wb_sunny,
-                            color: Colors.orange,
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${_formatDate(forecastDate)}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.blue,
                           ),
-                          Text(
-                            '${weather.temperature}°C',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.black,
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              defaultIcon,
+                              color: Colors.orange,
+                              size: 40,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Precipitation:',
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 16,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isCelsius
+                                      ? '${weather.temperature}°C'
+                                      : '${_celsiusToFahrenheit(weather.temperature)}°F',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Condition: ${weather.precipitationType} ',
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Text(
-                            '${weather.precipitationAmount} mm',
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Type:',
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            '${weather.precipitationType}',
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  double _celsiusToFahrenheit(double celsius) {
+    double fahrenheit = (celsius * 9 / 5) + 32;
+    return double.parse(fahrenheit.toStringAsFixed(1));
+  }
+
+  String _formatDate(DateTime date) {
+    return '${_getWeekday(date.weekday)}, ${date.day}/${date.month}';
+  }
+
+  String _getWeekday(int weekday) {
+    switch (weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    }
   }
 }
