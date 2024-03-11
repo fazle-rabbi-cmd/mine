@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mine/models/weather.dart';
+import 'package:mine/screens/settings_screen.dart';
 import 'package:mine/services/location_service.dart';
 import 'package:mine/services/weather_service.dart';
 import 'package:mine/widgets/current_weather_widget.dart';
@@ -205,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.black,
               ),
               child: Text(
                 'Menu',
@@ -219,9 +220,16 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
-                // Navigate to settings screen or perform necessary actions
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SettingsScreen(), // Replace SettingsScreen() with your actual settings screen widget
+                  ),
+                );
               },
             ),
+
             ListTile(
               leading: Icon(Icons.feedback),
               title: Text('Feedback'),

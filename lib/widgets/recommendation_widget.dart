@@ -61,8 +61,10 @@ class RecommendationWidget extends StatelessWidget {
       return 'Air quality is unhealthy for sensitive groups. People with respiratory or heart conditions, children, and older adults should reduce prolonged or heavy outdoor exertion.';
     } else if (airQualityIndex > 150 && airQualityIndex <= 200) {
       return 'Air quality is unhealthy. Everyone should reduce prolonged or heavy outdoor exertion.';
+    } else if (airQualityIndex > 200 && airQualityIndex <= 300) {
+      return 'Air quality is very unhealthy. Avoid outdoor activities and stay indoors as much as possible.';
     } else {
-      return 'Air quality is very unhealthy or hazardous. Avoid outdoor activities.';
+      return 'Air quality is hazardous. Avoid outdoor activities and stay indoors.';
     }
   }
 
