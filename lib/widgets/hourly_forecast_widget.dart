@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import for date formatting
 import 'package:mine/models/weather.dart';
 
 class HourlyForecastWidget extends StatelessWidget {
@@ -16,17 +15,17 @@ class HourlyForecastWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 4.0),
           child: Text(
             'Hourly Forecast',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.blue, // Example color scheme
+              color: Colors.blue,
             ),
           ),
         ),
-        SizedBox(height: 10),
+        SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -35,80 +34,52 @@ class HourlyForecastWidget extends StatelessWidget {
               final weather = entry.value;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Hour $index', // Display hour number
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                child: SizedBox(
+                  width: 200,
+                  child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hour $index',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Temperature: ${weather.temperature}°C',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          SizedBox(height: 12),
+                          _buildWeatherInfo(
+                            'Temperature',
+                            '${weather.temperature}°C',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Feels Like: ${weather.feelsLikeTemperature}°C',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          _buildWeatherInfo(
+                            'Feels Like',
+                            '${weather.feelsLikeTemperature}°C',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Precipitation: ${weather.precipitationAmount} mm ${weather.precipitationType ?? ''}',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          _buildWeatherInfo(
+                            'Precipitation',
+                            '${weather.precipitationAmount} mm ${weather.precipitationType ?? ''}',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Wind: ${weather.windSpeed} km/h ${weather.windDirection ?? ''}',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          _buildWeatherInfo(
+                            'Wind',
+                            '${weather.windSpeed} km/h ${weather.windDirection ?? ''}',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Humidity: ${weather.humidity ?? ''}%',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          _buildWeatherInfo(
+                            'Humidity',
+                            '${weather.humidity ?? ''}%',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Chance of Rain: ${weather.chanceOfRain ?? ''}%',
-                          style: TextStyle(
-                            color: Colors.black87,
+                          _buildWeatherInfo(
+                            'Chance of Rain',
+                            '${weather.chanceOfRain ?? ''}%',
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Pressure: ${weather.pressure ?? ''} hPa',
-                          style: TextStyle(
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Visibility: ${weather.visibility ?? ''} km',
-                          style: TextStyle(
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -116,6 +87,31 @@ class HourlyForecastWidget extends StatelessWidget {
             }).toList(),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherInfo(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 18,
+          ),
+        ),
+        SizedBox(height: 8),
       ],
     );
   }

@@ -63,79 +63,15 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: List.generate(
-                widget.dailyForecast.length,
-                (index) {
-                  final weather = widget.dailyForecast[index];
-                  final forecastDate =
-                      DateTime.now().add(Duration(days: index));
-
-                  return Container(
-                    width: MediaQuery.of(context).size.width * 0.25,
-                    padding: EdgeInsets.all(16),
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: defaultBoxColor,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${_formatDate(forecastDate)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(
-                              defaultIcon,
-                              color: Colors.orange,
-                              size: 40,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _isCelsius
-                                      ? '${weather.temperature}°C'
-                                      : '${_celsiusToFahrenheit(weather.temperature)}°F',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Condition: ${weather.precipitationType} ',
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              children: widget.dailyForecast.map((weather) {
+                final forecastDate = DateTime.now()
+                    .add(Duration(days: widget.dailyForecast.indexOf(weather)));
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: _buildForecastCard(
+                      defaultIcon, defaultBoxColor, weather, forecastDate),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -143,9 +79,62 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
     );
   }
 
+  Widget _buildForecastCard(IconData defaultIcon, Color defaultBoxColor,
+      Weather weather, DateTime forecastDate) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.4,
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListTile(
+            leading: Icon(
+              defaultIcon,
+              color: Colors.orange,
+              size: 40,
+            ),
+            title: Text(
+              '${_formatDate(forecastDate)}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.blue,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isCelsius
+                      ? '${weather.temperature.toStringAsFixed(1)}°C'
+                      : '${_celsiusToFahrenheit(weather.temperature).toStringAsFixed(1)}°F',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Condition: ${weather.precipitationType} ',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   double _celsiusToFahrenheit(double celsius) {
-    double fahrenheit = (celsius * 9 / 5) + 32;
-    return double.parse(fahrenheit.toStringAsFixed(1));
+    return (celsius * 9 / 5) + 32;
   }
 
   String _formatDate(DateTime date) {
