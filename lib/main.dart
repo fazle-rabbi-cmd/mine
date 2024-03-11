@@ -1,30 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'screens/home_screen.dart';
-//
-// void main() {
-//   runApp(MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Weather Forecast App',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//         visualDensity: VisualDensity.adaptivePlatformDensity,
-//         brightness: Brightness.light,
-//       ),
-//       darkTheme: ThemeData(
-//         brightness: Brightness.dark, // Set the dark theme brightness
-//         // Define dark theme properties
-//       ),
-//       home: HomeScreen(
-//         apiKey: 'aa05b3052bf24c11b0a9cd580d0ca631',
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Import the provider package
 import 'screens/home_screen.dart';

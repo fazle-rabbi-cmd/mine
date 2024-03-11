@@ -138,10 +138,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _isDarkThemeEnabled = value;
           // Apply theme change logic here
           if (_isDarkThemeEnabled) {
-            // Set the dark theme
-            // Here, we're using the provider package to update the theme dynamically
-            // You can use any state management solution you prefer
-            // For simplicity, I'm showing how to use a ChangeNotifier
             Provider.of<ThemeNotifier>(context, listen: false)
                 .setDarkTheme(true);
           } else {
