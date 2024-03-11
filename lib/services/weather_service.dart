@@ -67,7 +67,7 @@ class WeatherService {
       final forecasts = data['data'] as List;
       return forecasts
           .map((forecast) => Weather.fromJson(forecast))
-          .take(24)
+          .take(12)
           .toList();
     } else {
       throw Exception('Failed to load hourly forecast');

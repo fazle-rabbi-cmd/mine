@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
 
 class CurrentWeatherWidget extends StatelessWidget {
@@ -143,6 +144,12 @@ class CurrentWeatherWidget extends StatelessWidget {
           '',
           Icons.nightlight_round, // Icon for sunset time
         ),
+        _buildWeatherInfo(
+          'Time',
+          _formatTime(currentWeather.time),
+          '',
+          Icons.access_time, // Icon for time
+        ),
       ],
     );
   }
@@ -181,6 +188,14 @@ class CurrentWeatherWidget extends StatelessWidget {
       return currentWeather.windDirection!;
     } else {
       return 'N/A';
+    }
+  }
+
+  String _formatTime(DateTime? time) {
+    if (time != null) {
+      return DateFormat.Hm().format(time); // Format time as HH:mm
+    } else {
+      return 'N/A'; // Return a message indicating time is not available
     }
   }
 }

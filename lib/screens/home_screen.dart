@@ -43,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Weather> dailyForecast = [];
   List<Weather> hourlyForecast = [];
-  String locationName = ''; // Added locationName variable
+  String locationName = '';
+  bool isCelsius = true; // Added locationName variable
 
   @override
   void initState() {
@@ -249,7 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               CurrentWeatherWidget(
                 currentWeather: currentWeather,
-                locationName: locationName, // Pass locationName
+                locationName: locationName,
+                // Pass locationName
               ),
               SizedBox(height: 20),
               CropSuggestionWidget(
