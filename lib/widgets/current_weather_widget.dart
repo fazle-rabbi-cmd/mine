@@ -4,163 +4,223 @@ import 'package:mine/models/weather.dart';
 
 class CurrentWeatherWidget extends StatelessWidget {
   final Weather currentWeather;
-  final String locationName; // Making locationName optional
+  final String locationName;
 
-  // Map to store precipitation types and their corresponding icons
   static const Map<String, IconData> precipitationIcons = {
     'rain': Icons.beach_access,
     'snow': Icons.ac_unit,
     'sleet': Icons.grain,
-    'hail': Icons.filter_drama,
-    'drizzle': Icons.grain, // Can be replaced with a specific drizzle icon
+    'hail': Icons.umbrella,
+    'drizzle': Icons.grain_outlined,
     'thunderstorm': Icons.flash_on,
-    'fog': Icons.filter_drama,
-    'mist': Icons.filter_drama,
-    'freezing rain': Icons.ac_unit, // You can replace this with a suitable icon
-    'hurricane': Icons.warning, // Example icon, can be changed
+    'mist': Icons.cloud,
+    'freezing rain': Icons.ac_unit,
+    'hurricane': Icons.warning,
     'sunny intervals': Icons.wb_sunny,
-    'showers': Icons.beach_access, // Example icon, can be changed
-    'blizzard': Icons.ac_unit, // Example icon, can be changed
-    'sandstorm': Icons.grain, // Example icon, can be changed
-    'tornado': Icons.warning, // Example icon, can be changed
-    'haze': Icons.filter_drama, // Example icon, can be changed
-    'smoke': Icons.whatshot, // Example icon, can be changed
-    'volcanic ash': Icons.volcano_outlined, // Example icon, can be changed
-    'clear sky': Icons.wb_sunny, // Example icon, can be changed
-    'broken clouds': Icons.cloud_outlined, // Example icon, can be changed
-    'few clouds': Icons.cloud_outlined, // Example icon, can be changed
-    'scattered clouds': Icons.cloud_outlined, // Example icon, can be changed
-    // Add more precipitation types and their icons as needed
+    'showers': Icons.bathtub,
+    'blizzard': Icons.ac_unit,
+    'tornado': Icons.warning,
+    'haze': Icons.cloud_circle,
+    'smoke': Icons.smoke_free,
+    'volcanic ash': Icons.volcano,
+    'clear sky': Icons.wb_sunny,
+    'broken clouds': Icons.cloud_circle_outlined,
+    'few clouds': Icons.cloud_queue,
+    'scattered clouds': Icons.cloud,
+  };
+
+  static const Map<String, Color> precipitationColors = {
+    'rain': Colors.blue,
+    'snow': Colors.white,
+    'sleet': Colors.blueGrey,
+    'hail': Colors.grey,
+    'drizzle': Colors.grey,
+    'thunderstorm': Colors.yellow,
+    'mist': Colors.grey,
+    'freezing rain': Colors.lightBlue,
+    'hurricane': Colors.red,
+    'sunny intervals': Colors.yellow,
+    'showers': Colors.blueGrey,
+    'blizzard': Colors.white,
+    'tornado': Colors.red,
+    'haze': Colors.grey,
+    'smoke': Colors.grey,
+    'volcanic ash': Colors.grey,
+    'clear sky': Colors.yellow,
+    'broken clouds': Colors.grey,
+    'few clouds': Colors.grey,
+    'scattered clouds': Colors.grey,
   };
 
   const CurrentWeatherWidget({
     Key? key,
     required this.currentWeather,
-    required this.locationName, // Making locationName optional
+    required this.locationName,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     IconData? precipitationIcon;
-    String? precipitationType;
+    Color? precipitationColor;
 
     if (currentWeather.precipitationType != null) {
-      precipitationType = currentWeather.precipitationType!.toLowerCase();
-      // Get the corresponding icon for the precipitation type from the map
+      String precipitationType =
+          currentWeather.precipitationType!.toLowerCase();
       precipitationIcon = precipitationIcons[precipitationType];
+      precipitationColor = precipitationColors[precipitationType];
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              locationName != null
-                  ? 'Current Weather in $locationName' // Display location name if available
-                  : 'Current Weather',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            locationName != null
+                ? 'Current Weather in $locationName'
+                : 'Current Weather',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
-            if (precipitationIcon != null)
-              Icon(
-                precipitationIcon,
-                color: Colors.blue, // Change the color here
-              ), // Display precipitation icon if available
-          ],
-        ),
-        SizedBox(height: 10),
-        _buildWeatherInfo(
-          'Temperature',
-          currentWeather.temperature.toString(),
-          '°C',
-          Icons.thermostat_outlined, // Icon for temperature
-        ),
-        _buildWeatherInfo(
-          'Feels Like',
-          currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
-          '°C',
-          Icons.thermostat_outlined, // Icon for feels like temperature
-        ),
-        _buildWeatherInfo(
-          'Precipitation',
-          _getPrecipitation(),
-          '',
-          Icons.water_outlined, // Icon for precipitation
-        ),
-        _buildWeatherInfo(
-          'Wind Speed',
-          _getWindSpeed(),
-          '',
-          Icons.air_outlined, // Icon for wind speed
-        ),
-        _buildWeatherInfo(
-          'Humidity',
-          currentWeather.humidity?.toString() ?? 'N/A',
-          '%',
-          Icons.water_outlined, // Icon for humidity
-        ),
-        _buildWeatherInfo(
-          'Chance of Rain',
-          currentWeather.chanceOfRain?.toString() ?? 'N/A',
-          '%',
-          Icons.water_outlined, // Icon for chance of rain
-        ),
-        _buildWeatherInfo(
-          'AQI',
-          currentWeather.aqi?.toString() ?? 'N/A',
-          '',
-          Icons.air_outlined, // Icon for AQI
-        ),
-        _buildWeatherInfo(
-          'UV Index',
-          currentWeather.uvIndex?.toString() ?? 'N/A',
-          '',
-          Icons.wb_sunny_outlined, // Icon for UV Index
-        ),
-        _buildWeatherInfo(
-          'Pressure',
-          currentWeather.pressure?.toString() ?? 'N/A',
-          'hPa',
-          Icons.speed_outlined, // Icon for pressure
-        ),
-        _buildWeatherInfo(
-          'Visibility',
-          currentWeather.visibility?.toString() ?? 'N/A',
-          'km',
-          Icons.visibility_outlined, // Icon for visibility
-        ),
-        _buildWeatherInfo(
-          'Sunrise Time',
-          currentWeather.sunriseTime ?? 'N/A',
-          '',
-          Icons.wb_sunny_outlined, // Icon for sunrise time
-        ),
-        _buildWeatherInfo(
-          'Sunset Time',
-          currentWeather.sunsetTime ?? 'N/A',
-          '',
-          Icons.nightlight_round, // Icon for sunset time
-        ),
-        _buildWeatherInfo(
-          'Time',
-          _formatTime(currentWeather.time),
-          '',
-          Icons.access_time, // Icon for time
-        ),
-      ],
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Temperature: ${currentWeather.temperature}°C',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+              ),
+              if (precipitationIcon != null)
+                Icon(
+                  precipitationIcon,
+                  color: precipitationColor,
+                ),
+            ],
+          ),
+          SizedBox(height: 10),
+          _buildWeatherInfo(
+            'Feels Like',
+            currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
+            '°C',
+            Icons.thermostat_outlined,
+            Colors.orange,
+          ),
+          _buildWeatherInfo(
+            'Precipitation',
+            _getPrecipitation(),
+            '',
+            Icons.water_outlined,
+            Colors.green,
+          ),
+          _buildWeatherInfo(
+            'Wind Speed',
+            _getWindSpeed(),
+            '',
+            Icons.air_outlined,
+            Colors.purple,
+          ),
+          _buildWeatherInfo(
+            'Humidity',
+            currentWeather.humidity?.toString() ?? 'N/A',
+            '%',
+            Icons.water_outlined,
+            Colors.blue,
+          ),
+          _buildWeatherInfo(
+            'Chance of Rain',
+            currentWeather.chanceOfRain?.toString() ?? 'N/A',
+            '%',
+            Icons.water_outlined,
+            Colors.indigo,
+          ),
+          _buildWeatherInfo(
+            'AQI',
+            currentWeather.aqi?.toString() ?? 'N/A',
+            '',
+            Icons.air_outlined,
+            Colors.red,
+          ),
+          _buildWeatherInfo(
+            'UV Index',
+            currentWeather.uvIndex?.toString() ?? 'N/A',
+            '',
+            Icons.wb_sunny_outlined,
+            Colors.yellow,
+          ),
+          _buildWeatherInfo(
+            'Pressure',
+            currentWeather.pressure?.toString() ?? 'N/A',
+            'hPa',
+            Icons.speed_outlined,
+            Colors.teal,
+          ),
+          _buildWeatherInfo(
+            'Visibility',
+            currentWeather.visibility?.toString() ?? 'N/A',
+            'km',
+            Icons.visibility_outlined,
+            Colors.lightBlue,
+          ),
+          _buildWeatherInfo(
+            'Sunrise Time',
+            currentWeather.sunriseTime ?? 'N/A',
+            '',
+            Icons.wb_sunny_outlined,
+            Colors.yellow,
+          ),
+          _buildWeatherInfo(
+            'Sunset Time',
+            currentWeather.sunsetTime ?? 'N/A',
+            '',
+            Icons.nightlight_round,
+            Colors.orange,
+          ),
+          _buildWeatherInfo(
+            'Time',
+            _formatTime(currentWeather.time),
+            '',
+            Icons.access_time,
+            Colors.grey,
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildWeatherInfo(
-      String label, String value, String unit, IconData iconData) {
+      String label, String value, String unit, IconData iconData, Color color) {
     return Row(
       children: [
-        Icon(iconData, color: Colors.blue), // Change the color here
+        Icon(
+          iconData,
+          color: color,
+        ),
         SizedBox(width: 5),
-        Text('$label: $value$unit'),
+        Text(
+          '$label: $value$unit',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }
@@ -193,9 +253,9 @@ class CurrentWeatherWidget extends StatelessWidget {
 
   String _formatTime(DateTime? time) {
     if (time != null) {
-      return DateFormat.Hm().format(time); // Format time as HH:mm
+      return DateFormat.Hm().format(time);
     } else {
-      return 'N/A'; // Return a message indicating time is not available
+      return 'N/A';
     }
   }
 }
