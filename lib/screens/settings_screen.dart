@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mine/services/notification_service.dart';
 import 'package:provider/provider.dart';
-
 import '../main.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -12,17 +12,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Variables to store user preferences
   bool _isCelsiusSelected = true;
   String _selectedLanguage = 'English';
-  bool _isNotificationEnabled = true;
+  bool _isNotificationEnabled = true; // Default value for notifications
   bool _isDarkThemeEnabled = false;
   String _selectedRefreshInterval = 'Every 30 minutes';
+
+  // Create an instance of NotificationService
+  NotificationService notificationService = NotificationService();
+
+  // Method to handle notification toggle
+  void _handleNotificationToggle(bool value) {
+    setState(() {
+      _isNotificationEnabled = value;
+    });
+    if (value) {
+      // If notifications are enabled, trigger notification logic
+      _triggerSevereWeatherAlertNotification();
+    }
+  }
+
+  // Method to trigger severe weather alert notification
+  void _triggerSevereWeatherAlertNotification() {
+    // Implement logic to send notification for severe weather alerts
+    // Example:
+    notificationService.sendSevereWeatherAlertNotification();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
-        // Add your app logo as the leading widget
-        // leading: Image.asset('assets/logo.png'),
       ),
       body: ListView(
         children: [
@@ -100,11 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SwitchListTile(
       title: Text('Enable Notifications'),
       value: _isNotificationEnabled,
-      onChanged: (value) {
-        setState(() {
-          _isNotificationEnabled = value;
-        });
-      },
+      onChanged: _handleNotificationToggle,
     );
   }
 
