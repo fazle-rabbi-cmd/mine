@@ -57,16 +57,7 @@ class CurrentWeatherWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            locationName != null
-                ? 'Current Weather in $locationName'
-                : 'Current Weather',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
+          _buildTitle(),
           SizedBox(height: 20),
           _buildTemperatureRow(),
           SizedBox(height: 20),
@@ -77,6 +68,19 @@ class CurrentWeatherWidget extends StatelessWidget {
           SizedBox(height: 20),
           _buildWeatherDetails(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      locationName != null
+          ? 'Current Weather in $locationName'
+          : 'Current Weather',
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
       ),
     );
   }
@@ -121,77 +125,47 @@ class CurrentWeatherWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildWeatherInfo(
-          'Feels Like',
-          currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
-          '°C',
-          Icons.thermostat_rounded,
-        ),
+            'Feels Like',
+            currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
+            '°C',
+            Icons.thermostat_rounded),
         _buildWeatherInfo(
-          'Precipitation',
-          _getPrecipitation(),
-          '',
-          Icons.water_outlined,
-        ),
+            'Precipitation', _getPrecipitation(), '', Icons.water_outlined),
         _buildWeatherInfo(
-          'Wind Speed',
-          _getWindSpeed(),
-          '',
-          Icons.air_outlined,
-        ),
+            'Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
         _buildWeatherInfo(
-          'Humidity',
-          currentWeather.humidity?.toString() ?? 'N/A',
-          '%',
-          Icons.water_outlined,
-        ),
+            'Humidity',
+            currentWeather.humidity?.toString() ?? 'N/A',
+            '%',
+            Icons.water_outlined),
         _buildWeatherInfo(
-          'Chance of Rain',
-          currentWeather.chanceOfRain?.toString() ?? 'N/A',
-          '%',
-          Icons.water_outlined,
-        ),
+            'Chance of Rain',
+            currentWeather.chanceOfRain?.toString() ?? 'N/A',
+            '%',
+            Icons.water_outlined),
+        _buildWeatherInfo('AQI', currentWeather.aqi?.toString() ?? 'N/A', '',
+            Icons.air_outlined),
         _buildWeatherInfo(
-          'AQI',
-          currentWeather.aqi?.toString() ?? 'N/A',
-          '',
-          Icons.air_outlined,
-        ),
+            'UV Index',
+            currentWeather.uvIndex?.toString() ?? 'N/A',
+            '',
+            Icons.wb_sunny_outlined),
         _buildWeatherInfo(
-          'UV Index',
-          currentWeather.uvIndex?.toString() ?? 'N/A',
-          '',
-          Icons.wb_sunny_outlined,
-        ),
+            'Pressure',
+            currentWeather.pressure?.toString() ?? 'N/A',
+            'hPa',
+            Icons.speed_outlined),
         _buildWeatherInfo(
-          'Pressure',
-          currentWeather.pressure?.toString() ?? 'N/A',
-          'hPa',
-          Icons.speed_outlined,
-        ),
+            'Visibility',
+            currentWeather.visibility?.toString() ?? 'N/A',
+            'km',
+            Icons.visibility_outlined),
+        _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A',
+            '', Icons.wb_sunny_outlined),
+        _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '',
+            Icons.nightlight_round),
         _buildWeatherInfo(
-          'Visibility',
-          currentWeather.visibility?.toString() ?? 'N/A',
-          'km',
-          Icons.visibility_outlined,
-        ),
-        _buildWeatherInfo(
-          'Sunrise Time',
-          currentWeather.sunriseTime ?? 'N/A',
-          '',
-          Icons.wb_sunny_outlined,
-        ),
-        _buildWeatherInfo(
-          'Sunset Time',
-          currentWeather.sunsetTime ?? 'N/A',
-          '',
-          Icons.nightlight_round,
-        ),
-        _buildWeatherInfo(
-          'Time',
-          _formatTime(currentWeather.time),
-          '',
-          Icons.access_time,
-        ),
+            'Time', _formatTime(currentWeather.time), '', Icons.access_time),
       ],
     );
   }
@@ -256,10 +230,6 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   String _formatTime(DateTime? time) {
-    if (time != null) {
-      return DateFormat.Hm().format(time);
-    } else {
-      return 'N/A';
-    }
+    return time != null ? DateFormat.Hm().format(time) : 'N/A';
   }
 }
