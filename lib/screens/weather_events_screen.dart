@@ -42,14 +42,7 @@ class WeatherEventsScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Navigation options can be added here
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              // Implement navigation logic here
-            },
-            color: Colors.white,
-          ),
+          // Remove the IconButton widget
         ],
       ),
     );
@@ -136,3 +129,101 @@ class WeatherEventsScreen extends StatelessWidget {
     );
   }
 }
+
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+//
+// class WeatherEventsScreen extends StatefulWidget {
+//   @override
+//   _WeatherEventsScreenState createState() => _WeatherEventsScreenState();
+// }
+//
+// class _WeatherEventsScreenState extends State<WeatherEventsScreen> {
+//   List<String> events = [];
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchWeatherAlerts();
+//   }
+//
+//   Future<void> fetchWeatherAlerts() async {
+//     // Replace 'YOUR_API_KEY' with your actual Weatherbit API key
+//     final apiKey = 'aa05b3052bf24c11b0a9cd580d0ca631';
+//     final apiUrl = 'https://api.weatherbit.io/v2.0/alerts?&key=$apiKey';
+//
+//     try {
+//       final response = await http.get(Uri.parse(apiUrl));
+//       if (response.statusCode == 200) {
+//         final data = jsonDecode(response.body);
+//         // Extract weather alerts from the response
+//         final List<dynamic> alerts = data['alerts'];
+//         setState(() {
+//           events = alerts
+//               .map<String>((alert) => alert['description'].toString())
+//               .toList();
+//         });
+//       } else {
+//         // Handle errors
+//         print('Failed to load weather alerts: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       // Handle exceptions
+//       print('Error loading weather alerts: $e');
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Weather Events'),
+//       ),
+//       body: SingleChildScrollView(
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             _buildNotifications(),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildNotifications() {
+//     return Container(
+//       padding: EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         border: Border.all(color: Colors.grey),
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             'Notifications/Alerts',
+//             style: TextStyle(
+//               fontSize: 20,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           SizedBox(height: 10),
+//           // Display notifications/alerts in a ListView
+//           ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: events.length,
+//             itemBuilder: (context, index) {
+//               return ListTile(
+//                 title: Text(
+//                   events[index],
+//                   style: TextStyle(fontSize: 16),
+//                 ),
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
