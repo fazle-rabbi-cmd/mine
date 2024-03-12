@@ -7,6 +7,7 @@ import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
 import '../widgets/recommendation_widget.dart';
+import '../screens/weather_events_screen.dart';
 
 import '../widgets/crop_suggestions_widget.dart';
 import '../widgets/search_dialogue.dart'; // Import the search dialog
@@ -226,6 +227,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(
                     builder: (context) =>
                         SettingsScreen(), // Replace SettingsScreen() with your actual settings screen widget
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.event),
+              title: Text('Weather Events'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        WeatherEventsScreen(), // Navigate to WeatherEventsScreen
                   ),
                 );
               },
