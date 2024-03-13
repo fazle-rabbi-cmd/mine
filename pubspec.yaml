@@ -38,6 +38,7 @@ dependencies:
 
   flutter_local_notifications: ^17.0.0
   permission_handler: ^11.3.0
+  fl_chart: ^0.66.2
 
 
 
