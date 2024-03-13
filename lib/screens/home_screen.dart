@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:mine/models/weather.dart';
 import 'package:mine/screens/settings_screen.dart';
+
 import 'package:mine/services/location_service.dart';
 import 'package:mine/services/weather_service.dart';
 import 'package:mine/widgets/current_weather_widget.dart';
 import 'package:mine/widgets/daily_forecast_widget.dart';
 import 'package:mine/widgets/hourly_forecast_widget.dart';
-import '../widgets/recommendation_widget.dart';
-import '../screens/weather_events_screen.dart';
-
-import '../widgets/crop_suggestions_widget.dart';
-import '../widgets/search_dialogue.dart'; // Import the search dialog
-import '../widgets/date_picker_dialogue.dart'; // Import the date picker dialog
+import 'package:mine/widgets/recommendation_widget.dart';
+import 'package:mine/screens/weather_events_screen.dart';
+import 'package:mine/widgets/crop_suggestions_widget.dart';
+import 'package:mine/widgets/search_dialogue.dart';
+import 'package:mine/widgets/date_picker_dialogue.dart';
 
 class HomeScreen extends StatefulWidget {
   final String apiKey;
@@ -45,46 +46,80 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Weather> dailyForecast = [];
   List<Weather> hourlyForecast = [];
   String locationName = '';
-  bool isCelsius = true; // Added locationName variable
 
   @override
   void initState() {
     super.initState();
-    fetchWeatherData();
+    _fetchWeatherData();
+    _requestLocationPermission();
   }
 
-  Future<void> fetchWeatherData() async {
+  Future<void> _requestLocationPermission() async {
+    final PermissionStatus permissionStatus = await Permission.location.request();
+    if (permissionStatus.isDenied) {
+      // Show a dialog informing the user about the importance of granting location permission
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Location Permission Required'),
+            content: Text('To provide accurate weather forecast, please grant location permission.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Open app settings to allow the user to grant permission manually
+                  openAppSettings();
+                },
+                child: Text('Open Settings'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (permissionStatus.isGranted) {
+      // Permission is granted, fetch weather data
+      _fetchWeatherData();
+    }
+  }
+
+
+  Future<void> _fetchWeatherData() async {
     try {
       final locationService = LocationService();
       final weatherService = WeatherService(widget.apiKey);
 
-      final position = await locationService.getCurrentLocation();
-      final lat = position.latitude;
-      final lon = position.longitude;
+      final permissionStatus = await Permission.location.request();
+      if (permissionStatus.isGranted) {
+        final position = await locationService.getCurrentLocation();
+        final lat = position.latitude;
+        final lon = position.longitude;
 
-      final currentWeatherData =
-          await weatherService.getCurrentWeather(lat, lon);
+        final currentWeatherData = await weatherService.getCurrentWeather(lat, lon);
 
-      // Update locationName with current location's name
-      setState(() {
-        currentWeather = currentWeatherData;
-        locationName = currentWeatherData.locationName!;
-      });
+        setState(() {
+          currentWeather = currentWeatherData;
+          locationName = currentWeatherData.locationName!;
+        });
 
-      final dailyForecastData = await weatherService.getDailyForecast(lat, lon);
-      final hourlyForecastData =
-          await weatherService.getHourlyForecast(lat, lon);
+        final dailyForecastData = await weatherService.getDailyForecast(lat, lon);
+        final hourlyForecastData = await weatherService.getHourlyForecast(lat, lon);
 
-      setState(() {
-        dailyForecast = dailyForecastData;
-        hourlyForecast = hourlyForecastData;
-      });
+        setState(() {
+          dailyForecast = dailyForecastData;
+          hourlyForecast = hourlyForecastData;
+
+
+        });
+      } else if (permissionStatus.isDenied) {
+        // Handle permission denied scenario
+      }
     } catch (e) {
       print('Error fetching weather data: $e');
     }
   }
 
-  // Method to fetch weather data for the selected date
+
   Future<void> fetchWeatherDataForDate(DateTime selectedDate) async {
     try {
       final locationService = LocationService();
@@ -94,10 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final lat = position.latitude;
       final lon = position.longitude;
 
-      // Fetch weather data for the selected date
       final weatherData =
-          await weatherService.getWeatherForDate(lat, lon, selectedDate);
-      // Update UI with weather data for the selected date
+      await weatherService.getWeatherForDate(lat, lon, selectedDate);
+
       setState(() {
         currentWeather = weatherData;
         locationName = weatherData.locationName!;
@@ -107,21 +141,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Method to show the date picker dialog
   Future<void> _showDatePickerDialog() async {
     showDatePickerDialog(context, (DateTime selectedDate) {
-      // Handle selected date here
       fetchWeatherDataForDate(selectedDate);
     });
   }
 
-  // Define the showSearchScreen method here
   Future<void> showSearchScreen(
       BuildContext context,
       String apiKey,
       Null Function(Weather weather, List<Weather> dailyForecast,
-              List<Weather> hourlyForecast, String locationName)
-          param2) async {
+          List<Weather> hourlyForecast, String locationName)
+      param2) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -201,7 +232,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // Add a drawer with options like settings and feedback
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -225,8 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        SettingsScreen(), // Replace SettingsScreen() with your actual settings screen widget
+                    builder: (context) => SettingsScreen(),
                   ),
                 );
               },
@@ -238,13 +267,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        WeatherEventsScreen(), // Navigate to WeatherEventsScreen
+                    builder: (context) => WeatherEventsScreen(),
                   ),
                 );
               },
             ),
-
             ListTile(
               leading: Icon(Icons.feedback),
               title: Text('Feedback'),
@@ -252,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Navigate to feedback screen or perform necessary actions
               },
             ),
-            // Add more options as needed
           ],
         ),
       ),
@@ -265,16 +291,15 @@ class _HomeScreenState extends State<HomeScreen> {
               CurrentWeatherWidget(
                 currentWeather: currentWeather,
                 locationName: locationName,
-                // Pass locationName
               ),
               SizedBox(height: 20),
               CropSuggestionWidget(
                 temperature: currentWeather.temperature,
-                humidity:
-                    double.tryParse(currentWeather.humidity.toString()) ?? 0,
+                humidity: double.tryParse(currentWeather.humidity.toString()) ??
+                    0,
                 precipitationType: currentWeather.precipitationType,
                 precipitationAmount: double.tryParse(
-                        currentWeather.precipitationAmount.toString()) ??
+                    currentWeather.precipitationAmount.toString()) ??
                     0,
               ),
               SizedBox(height: 20),
