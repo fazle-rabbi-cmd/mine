@@ -197,7 +197,7 @@ class CurrentWeatherWidget extends StatelessWidget {
   IconData? _getPrecipitationIcon() {
     if (currentWeather.precipitationType != null) {
       String precipitationType =
-          currentWeather.precipitationType!.toLowerCase();
+      currentWeather.precipitationType!.toLowerCase();
       return precipitationIcons[precipitationType];
     }
     return null;

@@ -34,9 +34,15 @@ class HourlyForecastWidget extends StatelessWidget {
               final weather = entry.value;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SizedBox(
-                  width: 200,
-                  child: _buildHourlyCard(index, weather),
+                child: GestureDetector(
+                  onTap: () => _showHourlyDetailsDialog(context, index, weather),
+                  child: FadeIn(
+                    duration: Duration(milliseconds: 500),
+                    child: SizedBox(
+                      width: 200,
+                      child: _buildHourlyCard(index, weather),
+                    ),
+                  ),
                 ),
               );
             }).toList(),
@@ -79,9 +85,6 @@ class HourlyForecastWidget extends StatelessWidget {
             _buildWeatherInfo(Icons.thermostat, 'Temperature', '${weather.temperature}°C'),
             _buildWeatherInfo(Icons.thermostat_outlined, 'Feels Like', '${weather.feelsLikeTemperature}°C'),
             _buildWeatherInfo(Icons.waves, 'Precipitation', '${weather.precipitationAmount} mm ${weather.precipitationType ?? ''}'),
-            _buildWeatherInfo(Icons.air, 'Wind', '${weather.windSpeed} km/h ${weather.windDirection ?? ''}'),
-            _buildWeatherInfo(Icons.water_damage, 'Humidity', '${weather.humidity ?? ''}%'),
-            _buildWeatherInfo(Icons.wb_sunny, 'Chance of Rain', '${weather.chanceOfRain ?? ''}%'),
           ],
         ),
       ),
@@ -118,6 +121,111 @@ class HourlyForecastWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showHourlyDetailsDialog(BuildContext context, int index, Weather weather) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Hour $index Forecast Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(Icons.thermostat, 'Temperature', '${weather.temperature}°C'),
+                _buildDetailRow(Icons.thermostat_outlined, 'Feels Like', '${weather.feelsLikeTemperature}°C'),
+                _buildDetailRow(Icons.waves, 'Precipitation', '${weather.precipitationAmount} mm ${weather.precipitationType ?? ''}'),
+                _buildDetailRow(Icons.air, 'Wind', '${weather.windSpeed} km/h ${weather.windDirection ?? ''}'),
+                _buildDetailRow(Icons.water_damage, 'Humidity', '${weather.humidity ?? ''}%'),
+                _buildDetailRow(Icons.wb_sunny, 'Chance of Rain', '${weather.chanceOfRain ?? ''}%'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 8.0,
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.blue),
+        SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 18,
+                ),
+              ),
+              SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class FadeIn extends StatefulWidget {
+  final Widget child;
+  final Duration duration;
+
+  const FadeIn({Key? key, required this.child, this.duration = const Duration(milliseconds: 300)}) : super(key: key);
+
+  @override
+  _FadeInState createState() => _FadeInState();
+}
+
+class _FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: widget.child,
     );
   }
 }

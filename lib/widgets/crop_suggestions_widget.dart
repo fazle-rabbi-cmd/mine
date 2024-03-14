@@ -64,9 +64,7 @@ class CropSuggestionWidget extends StatelessWidget {
       }
     }
 
-    return suggestedCrops
-        .toSet()
-        .toList(); // Remove duplicates and convert back to list
+    return suggestedCrops.toSet().toList();
   }
 
   @override
@@ -83,28 +81,34 @@ class CropSuggestionWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: Colors.green,
             ),
           ),
         ),
         SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              SizedBox(width: 16), // Add some padding at the beginning
               for (String crop in crops)
-                Container(
-                  margin: EdgeInsets.only(right: 8),
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    crop,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Chip(
+                    label: Text(
+                      crop,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    backgroundColor: Colors.green,
+                    elevation: 3,
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    labelPadding: EdgeInsets.symmetric(horizontal: 4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
