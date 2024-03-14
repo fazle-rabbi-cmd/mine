@@ -39,6 +39,8 @@ dependencies:
   flutter_local_notifications: ^17.0.0
   permission_handler: ^11.3.0
   fl_chart: ^0.66.2
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
 
 
 

@@ -18,6 +18,7 @@ class Weather {
   final String? zone;
   final double? latitude; // Latitude property
   final double? longitude; // Longitude property
+  final String? weatherIconCode; // Weather icon code property
 
   Weather({
     required this.temperature,
@@ -37,8 +38,9 @@ class Weather {
     this.time,
     this.locationName,
     this.zone,
-    this.latitude, // Include latitude in the constructor
-    this.longitude, // Include longitude in the constructor
+    this.latitude,
+    this.longitude,
+    this.weatherIconCode, // Include weather icon code property
   });
 
   static Weather fromJson(Map<String, dynamic> data) {
@@ -59,10 +61,10 @@ class Weather {
       sunsetTime: data['sunset'] ?? '',
       locationName: data['city_name'] ?? '',
       zone: data['timezone'] ?? '',
-      latitude: data['lat'] ?? 0.0, // Assign latitude value
-      longitude: data['lon'] ?? 0.0, // Assign longitude value
+      latitude: data['lat'] ?? 0.0,
+      longitude: data['lon'] ?? 0.0,
+      weatherIconCode: data['weather']['icon'] ?? '', // Assign weather icon code
       time: data['time'] != null ? DateTime.parse(data['time']) : null,
-// Parse time from data,
     );
   }
 }
