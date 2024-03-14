@@ -38,8 +38,6 @@ class CurrentWeatherWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IconData? precipitationIcon = _getPrecipitationIcon();
-
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -89,33 +87,37 @@ class CurrentWeatherWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Temperature',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 20,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              '${currentWeather.temperature}°C',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+        _buildTemperature(),
         if (_getPrecipitationIcon() != null)
           Icon(
             _getPrecipitationIcon(),
             size: 80,
             color: Colors.blue[300],
           ),
+      ],
+    );
+  }
+
+  Widget _buildTemperature() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Temperature',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 20,
+          ),
+        ),
+        SizedBox(height: 5),
+        Text(
+          '${currentWeather.temperature}°C',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -129,49 +131,22 @@ class CurrentWeatherWidget extends StatelessWidget {
             currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
             '°C',
             Icons.thermostat_rounded),
-        _buildWeatherInfo(
-            'Precipitation', _getPrecipitation(), '', Icons.water_outlined),
-        _buildWeatherInfo(
-            'Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
-        _buildWeatherInfo(
-            'Humidity',
-            currentWeather.humidity?.toString() ?? 'N/A',
-            '%',
-            Icons.water_outlined),
-        _buildWeatherInfo(
-            'Chance of Rain',
-            currentWeather.chanceOfRain?.toString() ?? 'N/A',
-            '%',
-            Icons.water_outlined),
-        _buildWeatherInfo('AQI', currentWeather.aqi?.toString() ?? 'N/A', '',
-            Icons.air_outlined),
-        _buildWeatherInfo(
-            'UV Index',
-            currentWeather.uvIndex?.toString() ?? 'N/A',
-            '',
-            Icons.wb_sunny_outlined),
-        _buildWeatherInfo(
-            'Pressure',
-            currentWeather.pressure?.toString() ?? 'N/A',
-            'hPa',
-            Icons.speed_outlined),
-        _buildWeatherInfo(
-            'Visibility',
-            currentWeather.visibility?.toString() ?? 'N/A',
-            'km',
-            Icons.visibility_outlined),
-        _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A',
-            '', Icons.wb_sunny_outlined),
-        _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '',
-            Icons.nightlight_round),
-        _buildWeatherInfo(
-            'Time', _formatTime(currentWeather.time), '', Icons.access_time),
+        _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
+        _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
+        _buildWeatherInfo('Humidity', currentWeather.humidity?.toString() ?? 'N/A', '%', Icons.water_outlined),
+        _buildWeatherInfo('Chance of Rain', currentWeather.chanceOfRain?.toString() ?? 'N/A', '%', Icons.water_outlined),
+        _buildWeatherInfo('AQI', currentWeather.aqi?.toString() ?? 'N/A', '', Icons.air_outlined),
+        _buildWeatherInfo('UV Index', currentWeather.uvIndex?.toString() ?? 'N/A', '', Icons.wb_sunny_outlined),
+        _buildWeatherInfo('Pressure', currentWeather.pressure?.toString() ?? 'N/A', 'hPa', Icons.speed_outlined),
+        _buildWeatherInfo('Visibility', currentWeather.visibility?.toString() ?? 'N/A', 'km', Icons.visibility_outlined),
+        _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
+        _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
+        _buildWeatherInfo('Time', _formatTime(currentWeather.time), '', Icons.access_time),
       ],
     );
   }
 
-  Widget _buildWeatherInfo(
-      String label, String value, String unit, IconData iconData) {
+  Widget _buildWeatherInfo(String label, String value, String unit, IconData iconData) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -196,29 +171,22 @@ class CurrentWeatherWidget extends StatelessWidget {
 
   IconData? _getPrecipitationIcon() {
     if (currentWeather.precipitationType != null) {
-      String precipitationType =
-      currentWeather.precipitationType!.toLowerCase();
+      String precipitationType = currentWeather.precipitationType!.toLowerCase();
       return precipitationIcons[precipitationType];
     }
     return null;
   }
 
   String _getPrecipitation() {
-    if (currentWeather.precipitationType != null &&
-        currentWeather.precipitationAmount != null) {
-      return '${currentWeather.precipitationAmount} mm ${currentWeather.precipitationType}';
-    } else if (currentWeather.precipitationType != null) {
+    if (currentWeather.precipitationType != null) {
       return currentWeather.precipitationType!;
-    } else if (currentWeather.precipitationAmount != null) {
-      return '${currentWeather.precipitationAmount} mm';
     } else {
       return 'N/A';
     }
   }
 
   String _getWindSpeed() {
-    if (currentWeather.windSpeed != null &&
-        currentWeather.windDirection != null) {
+    if (currentWeather.windSpeed != null && currentWeather.windDirection != null) {
       return '${currentWeather.windSpeed} km/h ${currentWeather.windDirection}';
     } else if (currentWeather.windSpeed != null) {
       return '${currentWeather.windSpeed} ';

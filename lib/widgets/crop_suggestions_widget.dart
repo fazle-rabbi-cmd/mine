@@ -17,17 +17,22 @@ class CropSuggestionWidget extends StatelessWidget {
     List<String> suggestedCrops = [];
 
     // Temperature-based suggestions
-    if (temperature >= 25 && temperature <= 35) {
-      suggestedCrops.addAll(['Tomatoes', 'Peppers', 'Cucumbers']);
-      if (temperature >= 28 && temperature <= 32) {
-        suggestedCrops.add('Bell Peppers');
+    if (temperature >= 30 && temperature <= 40) {
+      suggestedCrops.addAll(['Tomatoes', 'Peppers', 'Cucumbers', 'Eggplants']);
+      if (temperature >= 35 && temperature <= 38) {
+        suggestedCrops.add('Chillies');
       }
-    } else if (temperature >= 20 && temperature < 25) {
-      suggestedCrops.addAll(['Lettuce', 'Spinach', 'Carrots']);
-    } else if (temperature > 35) {
-      suggestedCrops.addAll(['Cactus', 'Succulents']);
+    } else if (temperature >= 20 && temperature < 30) {
+      suggestedCrops.addAll(['Lettuce', 'Spinach', 'Carrots', 'Radishes']);
+      if (temperature >= 25 && temperature <= 28) {
+        suggestedCrops.add('Green Beans');
+      }
+    } else if (temperature >= 10 && temperature < 20) {
+      suggestedCrops.addAll(['Cabbage', 'Broccoli', 'Kale', 'Cauliflower']);
     } else if (temperature < 10) {
-      suggestedCrops.addAll(['Cabbage', 'Broccoli', 'Kale']);
+      suggestedCrops.addAll(['Turnips', 'Beets', 'Brussels Sprouts']);
+    } else if (temperature > 40) {
+      suggestedCrops.addAll(['Cactus', 'Succulents']);
     }
 
     // Humidity-based suggestions
@@ -81,7 +86,7 @@ class CropSuggestionWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: Colors.blue,
             ),
           ),
         ),
