@@ -47,17 +47,25 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   Widget _buildTitle() {
-    return Text(
-      locationName != null
-          ? 'Current Weather in $locationName'
-          : 'Current Weather',
-      style: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          locationName != null
+              ? 'Current Weather in $locationName'
+              : 'Current Weather',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(height: 10), // Adjust spacing between title and date/time
+        _buildDateTimeInfo(), // Display Date and Time below the title
+      ],
     );
   }
+
 
   Widget _buildTemperatureRow() {
     return Row(
@@ -97,21 +105,92 @@ class CurrentWeatherWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildWeatherInfo('Feels Like', _getValueOrNA(currentWeather.feelsLikeTemperature), '°C', Icons.thermostat_rounded),
-        _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
-        _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
-        _buildWeatherInfo('Humidity', _getValueOrNA(currentWeather.humidity), '%', Icons.water_outlined),
-        _buildWeatherInfo('Chance of Rain', _getValueOrNA(currentWeather.chanceOfRain), '%', Icons.water_outlined),
-        _buildWeatherInfo('AQI', _getValueOrNA(currentWeather.aqi), '', Icons.air_rounded),
-        _buildWeatherInfo('UV Index', _getValueOrNA(currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
-        _buildWeatherInfo('Pressure', _getValueOrNA(currentWeather.pressure), 'hPa', Icons.speed_outlined),
-        _buildWeatherInfo('Visibility', _getValueOrNA(currentWeather.visibility), 'km', Icons.visibility_outlined),
-        _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
-        _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
-        _buildWeatherInfo('Time', _formatTime(currentWeather.time), '', Icons.access_time),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildWeatherInfo('Feels Like', _getValueOrNA(currentWeather.feelsLikeTemperature), '°C', Icons.thermostat_rounded),
+            _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
+            _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
+            _buildWeatherInfo('Humidity', _getValueOrNA(currentWeather.humidity), '%', Icons.water_outlined),
+            _buildWeatherInfo('Chance of Rain', _getValueOrNA(currentWeather.chanceOfRain), '%', Icons.water_outlined),
+            _buildWeatherInfo('AQI', _getValueOrNA(currentWeather.aqi), '', Icons.air_rounded),
+            _buildWeatherInfo('UV Index', _getValueOrNA(currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
+            _buildWeatherInfo('Pressure', _getValueOrNA(currentWeather.pressure), 'hPa', Icons.speed_outlined),
+            _buildWeatherInfo('Visibility', _getValueOrNA(currentWeather.visibility), 'km', Icons.visibility_outlined),
+            _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
+            _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
+          ],
+        ),
       ],
     );
   }
+
+  Widget _buildDateTimeInfo() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.calendar_today,
+          color: Colors.grey[600],
+          size: 28,
+        ),
+        SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Date',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              '${_formatDate(DateTime.now())}',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(width: 20),
+        Icon(
+          Icons.access_time,
+          color: Colors.grey[600],
+          size: 28,
+        ),
+        SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Time',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              '${_formatTime(DateTime.now())}',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+
+
 
   Widget _buildWeatherInfo(String label, String value, String unit, IconData iconData) {
     return Padding(
@@ -176,6 +255,10 @@ class CurrentWeatherWidget extends StatelessWidget {
 
   String _formatTime(DateTime? time) {
     return time != null ? DateFormat.Hm().format(time) : 'N/A';
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('EEE, MMM d, yyyy').format(date);
   }
 
   String _getValueOrNA(dynamic value) {
