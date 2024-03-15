@@ -1,11 +1,6 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http;
 
 class CurrentWeatherWidget extends StatelessWidget {
   final Weather currentWeather;
@@ -65,19 +60,14 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   Widget _buildTemperatureRow() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildTemperature(),
-          if (_getPrecipitationIcon() != null)
-            _buildSvgPicture(_getPrecipitationIcon()!),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildTemperature(),
+        if (_getPrecipitationIcon() != null) _buildWeatherIcon(_getPrecipitationIcon()!),
+      ],
     );
   }
-
 
   Widget _buildTemperature() {
     return Column(
@@ -104,32 +94,24 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   Widget _buildWeatherDetails() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildWeatherInfo(
-              'Feels Like',
-              currentWeather.feelsLikeTemperature?.toString() ?? 'N/A',
-              '°C',
-              Icons.thermostat_rounded),
-          _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
-          _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
-          _buildWeatherInfo('Humidity', currentWeather.humidity?.toString() ?? 'N/A', '%', Icons.water_outlined),
-          _buildWeatherInfo('Chance of Rain', currentWeather.chanceOfRain?.toString() ?? 'N/A', '%', Icons.water_outlined),
-          _buildWeatherInfo('AQI', currentWeather.aqi?.toString() ?? 'N/A', '', Icons.air_outlined),
-          _buildWeatherInfo('UV Index', currentWeather.uvIndex?.toString() ?? 'N/A', '', Icons.wb_sunny_outlined),
-          _buildWeatherInfo('Pressure', currentWeather.pressure?.toString() ?? 'N/A', 'hPa', Icons.speed_outlined),
-          _buildWeatherInfo('Visibility', currentWeather.visibility?.toString() ?? 'N/A', 'km', Icons.visibility_outlined),
-          _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
-          _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
-          _buildWeatherInfo('Time', _formatTime(currentWeather.time), '', Icons.access_time),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildWeatherInfo('Feels Like', _getValueOrNA(currentWeather.feelsLikeTemperature), '°C', Icons.thermostat_rounded),
+        _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
+        _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
+        _buildWeatherInfo('Humidity', _getValueOrNA(currentWeather.humidity), '%', Icons.water_outlined),
+        _buildWeatherInfo('Chance of Rain', _getValueOrNA(currentWeather.chanceOfRain), '%', Icons.water_outlined),
+        _buildWeatherInfo('AQI', _getValueOrNA(currentWeather.aqi), '', Icons.air_rounded),
+        _buildWeatherInfo('UV Index', _getValueOrNA(currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
+        _buildWeatherInfo('Pressure', _getValueOrNA(currentWeather.pressure), 'hPa', Icons.speed_outlined),
+        _buildWeatherInfo('Visibility', _getValueOrNA(currentWeather.visibility), 'km', Icons.visibility_outlined),
+        _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
+        _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
+        _buildWeatherInfo('Time', _formatTime(currentWeather.time), '', Icons.access_time),
+      ],
     );
   }
-
 
   Widget _buildWeatherInfo(String label, String value, String unit, IconData iconData) {
     return Padding(
@@ -154,6 +136,28 @@ class CurrentWeatherWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildWeatherIcon(String url) {
+    return Image(
+      image: NetworkImage(url),
+      width: 50,
+      height: 50,
+      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        } else {
+          return CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                : null,
+          );
+        }
+      },
+      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+        return Icon(Icons.error); // Placeholder icon for error
+      },
+    );
+  }
+
   String _getPrecipitation() {
     return currentWeather.precipitationType ?? 'N/A';
   }
@@ -174,37 +178,8 @@ class CurrentWeatherWidget extends StatelessWidget {
     return time != null ? DateFormat.Hm().format(time) : 'N/A';
   }
 
-  Widget _buildSvgPicture(String url) {
-    return Image(
-      image: NetworkImage(url),
-      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        } else {
-          return CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                : null,
-          );
-        }
-      },
-      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-        return Icon(Icons.error); // Placeholder icon for error
-      },
-    );
-  }
-
-
-
-
-  Future<Uint8List> _loadSvgImage(String url) async {
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final Uint8List bytes = response.bodyBytes;
-      return bytes;
-    } else {
-      throw Exception('Failed to load SVG');
-    }
+  String _getValueOrNA(dynamic value) {
+    return value?.toString() ?? 'N/A';
   }
 
   String? _getPrecipitationIcon() {
@@ -214,5 +189,4 @@ class CurrentWeatherWidget extends StatelessWidget {
     }
     return null;
   }
-
 }
