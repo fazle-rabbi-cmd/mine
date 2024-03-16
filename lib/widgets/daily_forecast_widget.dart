@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
 
 class DailyForecastWidget extends StatefulWidget {
   final List<Weather> dailyForecast;
-
-  const DailyForecastWidget({
-    Key? key,
-    required this.dailyForecast,
-  }) : super(key: key);
-
+  const DailyForecastWidget({Key? key, required this.dailyForecast}) : super(key: key);
   @override
   _DailyForecastWidgetState createState() => _DailyForecastWidgetState();
 }
@@ -21,51 +15,18 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), spreadRadius: 2, blurRadius: 5, offset: Offset(0, 2))]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Daily Forecast',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.swap_horiz),
-                onPressed: () {
-                  setState(() {
-                    _isCelsius = !_isCelsius;
-                  });
-                },
-              ),
-            ],
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text('Daily Forecast', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
+            IconButton(icon: Icon(Icons.swap_horiz), onPressed: () => setState(() => _isCelsius = !_isCelsius)),
+          ]),
           SizedBox(height: 16),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Row(
-              children: widget.dailyForecast.map((weather) {
-                final forecastDate = DateTime.now().add(Duration(days: widget.dailyForecast.indexOf(weather)));
-                return _buildForecastCard(weather, forecastDate);
-              }).toList(),
-            ),
+            child: Row(children: widget.dailyForecast.map((weather) => _buildForecastCard(weather, DateTime.now().add(Duration(days: widget.dailyForecast.indexOf(weather))))).toList()),
           ),
         ],
       ),
@@ -76,58 +37,27 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8),
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.lightBlue[100],
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: BoxDecoration(color: Colors.lightBlue[100], borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${_formatDate(forecastDate)}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.blue,
-            ),
-          ),
+          Text('${_formatDate(forecastDate)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.blue)),
           SizedBox(height: 8),
-          Row(
-            children: [
-              if (_getPrecipitationIcon(weather.precipitationType) != null)
-                _buildWeatherIcon(_getPrecipitationIcon(weather.precipitationType)!),
-              SizedBox(width: 8),
-              Text(
-                _isCelsius ? '${weather.temperature.toStringAsFixed(1)}°C' : '${_celsiusToFahrenheit(weather.temperature).toStringAsFixed(1)}°F',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
+          Row(children: [
+            if (_getPrecipitationIcon(weather.precipitationType) != null) _buildWeatherIcon(_getPrecipitationIcon(weather.precipitationType)!),
+            SizedBox(width: 8),
+            Text(_isCelsius ? '${weather.temperature.toStringAsFixed(1)}°C' : '${_celsiusToFahrenheit(weather.temperature).toStringAsFixed(1)}°F', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
+          ]),
           SizedBox(height: 8),
-          Text(
-            'Condition: ${weather.precipitationType}',
-            style: TextStyle(
-              color: Colors.grey[800],
-              fontSize: 16,
-            ),
-          ),
+          Text('Condition: ${weather.precipitationType}', style: TextStyle(color: Colors.grey[800], fontSize: 16)),
         ],
       ),
     );
   }
 
+  double _celsiusToFahrenheit(double celsius) => (celsius * 9 / 5) + 32;
 
-  double _celsiusToFahrenheit(double celsius) {
-    return (celsius * 9 / 5) + 32;
-  }
-
-  String _formatDate(DateTime date) {
-    return '${_getWeekday(date.weekday)}, ${date.day}/${date.month}';
-  }
+  String _formatDate(DateTime date) => '${_getWeekday(date.weekday)}, ${date.day}/${date.month}';
 
   String _getWeekday(int weekday) {
     switch (weekday) {
@@ -237,24 +167,12 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
   }
 
   Widget _buildWeatherIcon(String url) {
-    return Image(
-      image: NetworkImage(url),
-      width: 50,
-      height: 50,
-      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        } else {
-          return CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                : null,
-          );
-        }
-      },
-      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-        return Icon(Icons.error); // Placeholder icon for error
-      },
-    );
+    return Image(image: NetworkImage(url), width: 50, height: 50, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+      if (loadingProgress == null) {
+        return child;
+      } else {
+        return CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null);
+      }
+    }, errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) => Icon(Icons.error));
   }
 }
