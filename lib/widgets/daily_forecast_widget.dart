@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
 
 class DailyForecastWidget extends StatefulWidget {
@@ -18,9 +19,6 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final IconData defaultIcon = Icons.thermostat_rounded;
-    final Color defaultBoxColor = Colors.lightBlue[100]!;
-
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -64,13 +62,8 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: widget.dailyForecast.map((weather) {
-                final forecastDate = DateTime.now()
-                    .add(Duration(days: widget.dailyForecast.indexOf(weather)));
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: _buildForecastCard(
-                      defaultIcon, defaultBoxColor, weather, forecastDate),
-                );
+                final forecastDate = DateTime.now().add(Duration(days: widget.dailyForecast.indexOf(weather)));
+                return _buildForecastCard(weather, forecastDate);
               }).toList(),
             ),
           ),
@@ -79,59 +72,54 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
     );
   }
 
-  Widget _buildForecastCard(IconData defaultIcon, Color defaultBoxColor,
-      Weather weather, DateTime forecastDate) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.4,
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListTile(
-            leading: Icon(
-              defaultIcon,
-              color: Colors.orange,
-              size: 40,
-            ),
-            title: Text(
-              '${_formatDate(forecastDate)}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.blue,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _isCelsius
-                      ? '${weather.temperature.toStringAsFixed(1)}°C'
-                      : '${_celsiusToFahrenheit(weather.temperature).toStringAsFixed(1)}°F',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Condition: ${weather.precipitationType} ',
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: 16,
-                  ),
-                ),
-              ],
+  Widget _buildForecastCard(Weather weather, DateTime forecastDate) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.lightBlue[100],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${_formatDate(forecastDate)}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.blue,
             ),
           ),
-        ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              if (_getPrecipitationIcon(weather.precipitationType) != null)
+                _buildWeatherIcon(_getPrecipitationIcon(weather.precipitationType)!),
+              SizedBox(width: 8),
+              Text(
+                _isCelsius ? '${weather.temperature.toStringAsFixed(1)}°C' : '${_celsiusToFahrenheit(weather.temperature).toStringAsFixed(1)}°F',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Condition: ${weather.precipitationType}',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }
+
 
   double _celsiusToFahrenheit(double celsius) {
     return (celsius * 9 / 5) + 32;
@@ -160,5 +148,113 @@ class _DailyForecastWidgetState extends State<DailyForecastWidget> {
       default:
         return '';
     }
+  }
+
+  String? _getPrecipitationIcon(String? precipitationType) {
+    if (precipitationType != null) {
+      switch (precipitationType.toLowerCase()) {
+        case 'thunderstorm with light rain':
+          return 'https://www.weatherbit.io/static/img/icons/t01d.png'; // Replace with rain icon URL
+        case 'thunderstorm with rain':
+          return 'https://www.weatherbit.io/static/img/icons/t02d.png';
+        case 'thunderstorm with heavy rain':
+          return 'https://www.weatherbit.io/static/img/icons/t03d.png';
+        case 'thunderstorm with light drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/t04d.png'; // Replace with rain icon URL
+        case 'thunderstorm with drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/t04d.png';
+        case 'thunderstorm with heavy drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/t04d.png';
+        case 'thunderstorm with Hail':
+          return 'https://www.weatherbit.io/static/img/icons/t05d.png'; // Replace with rain icon URL
+        case 'light Drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/d01d.png';
+        case 'drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/d02d.png';
+        case 'heavy drizzle':
+          return 'https://www.weatherbit.io/static/img/icons/d03d.png'; // Replace with rain icon URL
+        case 'light rain':
+          return 'https://www.weatherbit.io/static/img/icons/r01d.png';
+        case 'moderate rain':
+          return 'https://www.weatherbit.io/static/img/icons/r02d.png';
+        case 'heavy rain':
+          return 'https://www.weatherbit.io/static/img/icons/r03d.png'; // Replace with rain icon URL
+        case 'freezing rain':
+          return 'https://www.weatherbit.io/static/img/icons/f01d.png';
+        case 'light shower rain':
+          return 'https://www.weatherbit.io/static/img/icons/r04d.png';
+        case 'shower rain':
+          return 'https://www.weatherbit.io/static/img/icons/r05d.png'; // Replace with rain icon URL
+        case 'heavy shower rain':
+          return 'https://www.weatherbit.io/static/img/icons/r06d.png';
+        case 'light snow':
+          return 'https://www.weatherbit.io/static/img/icons/s01d.png';
+        case 'snow':
+          return 'https://www.weatherbit.io/static/img/icons/s02d.png'; // Replace with rain icon URL
+        case 'heavy snow':
+          return 'https://www.weatherbit.io/static/img/icons/s03d.png';
+        case 'mix snow/rain':
+          return 'https://www.weatherbit.io/static/img/icons/s04d.png';
+        case 'sleet':
+          return 'https://www.weatherbit.io/static/img/icons/s05d.png'; // Replace with rain icon URL
+        case 'heavy sleet':
+          return 'https://www.weatherbit.io/static/img/icons/s05d.png';
+        case 'snow shower':
+          return 'https://www.weatherbit.io/static/img/icons/s01d.png';
+        case 'heavy snow shower':
+          return 'https://www.weatherbit.io/static/img/icons/s02d.png';
+        case 'flurries':
+          return 'https://www.weatherbit.io/static/img/icons/s06d.png';
+        case 'mist':
+          return 'https://www.weatherbit.io/static/img/icons/a01d.png';
+        case 'smoke':
+          return 'https://www.weatherbit.io/static/img/icons/a02d.png';
+        case 'haze':
+          return 'https://www.weatherbit.io/static/img/icons/a03d.png';
+        case '	sand/dust':
+          return 'https://www.weatherbit.io/static/img/icons/a04d.png';
+        case 'fog':
+          return 'https://www.weatherbit.io/static/img/icons/a05d.png';
+        case 'freezing fog':
+          return 'https://www.weatherbit.io/static/img/icons/a06d.png';
+        case 'clear sky':
+          return 'https://www.weatherbit.io/static/img/icons/c01d.png';
+        case 'few clouds':
+          return 'https://www.weatherbit.io/static/img/icons/c02d.png';
+        case 'scattered clouds':
+          return 'https://www.weatherbit.io/static/img/icons/c02d.png';
+        case 'broken clouds':
+          return 'https://www.weatherbit.io/static/img/icons/c03d.png';
+        case 'overcast clouds':
+          return 'https://www.weatherbit.io/static/img/icons/c04d.png';
+
+      // Add more cases as needed for other precipitation types
+        default:
+          return null; // Return null for unknown types or when no icon is available
+      }
+    }
+    return null;
+  }
+
+  Widget _buildWeatherIcon(String url) {
+    return Image(
+      image: NetworkImage(url),
+      width: 50,
+      height: 50,
+      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        } else {
+          return CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                : null,
+          );
+        }
+      },
+      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+        return Icon(Icons.error); // Placeholder icon for error
+      },
+    );
   }
 }
