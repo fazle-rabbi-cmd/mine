@@ -45,7 +45,7 @@ class Weather {
 
   static Weather fromJson(Map<String, dynamic> data) {
     return Weather(
-      temperature: data['temp'] ?? 0.0,
+      temperature: data['temp'].toDouble() ?? 0.0,
       feelsLikeTemperature: data['app_temp'] ?? 0.0,
       precipitationType: data['weather']['description'] ?? '',
       precipitationAmount: data['precip']?.toString() ?? '',

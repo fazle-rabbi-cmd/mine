@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mine/screens/past_weather_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mine/models/weather.dart';
 import 'package:mine/screens/settings_screen.dart';
@@ -167,6 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
             DrawerHeader(
               decoration: BoxDecoration(color: Colors.black),
               child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              leading: Icon(Icons.history),
+              title: Text('Past Weather'),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PastWeatherScreen())),
             ),
             ListTile(
               leading: Icon(Icons.settings),
