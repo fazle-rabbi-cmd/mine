@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mine/services/open_meteo_service.dart';
+import 'package:mine/services/past_weather_service.dart';
+import 'package:mine/widgets/past_weather_display.dart'; // Import the widget
 
 class PastWeatherScreen extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class PastWeatherScreen extends StatefulWidget {
 class _PastWeatherScreenState extends State<PastWeatherScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final OpenMeteoService _openMeteoService = OpenMeteoService('c0d1009550c934bb96a545c2d2f38878');
+  final PastWeatherService _openMeteoService = PastWeatherService('aa05b3052bf24c11b0a9cd580d0ca631');
 
   String _weatherData = '';
 
@@ -25,7 +26,10 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
     final location = _locationController.text;
 
     try {
-      final weatherData = await _openMeteoService.getPastWeather(location, DateTime.parse(date));
+      final coordinates = await _openMeteoService.getCoordinates(location);
+      final latitude = coordinates['latitude'];
+      final longitude = coordinates['longitude'];
+      final weatherData = await _openMeteoService.getPastWeather(latitude, longitude, date);
       setState(() {
         _weatherData = weatherData;
       });
@@ -60,14 +64,7 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
               child: Text('Search'),
             ),
             SizedBox(height: 16.0),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Text(
-                  _weatherData,
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ),
-            ),
+            PastWeatherDisplay(weatherData: _weatherData), // Use the widget here
           ],
         ),
       ),
