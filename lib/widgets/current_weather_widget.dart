@@ -25,7 +25,7 @@ class CurrentWeatherWidget extends StatelessWidget {
             children: [
               Text(
                 locationName != null ? 'Current Weather in $locationName' : 'Current Weather',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               SizedBox(height: 10),
               Row(
@@ -65,7 +65,7 @@ class CurrentWeatherWidget extends StatelessWidget {
                 children: [
                   Text('Temperature', style: TextStyle(color: Colors.grey[600], fontSize: 20)),
                   SizedBox(height: 5),
-                  Text('${currentWeather.temperature}°C', style: TextStyle(color: Colors.black, fontSize: 36, fontWeight: FontWeight.bold)),
+                  Text('${currentWeather.temperature}°C', style: TextStyle(color: Colors.red, fontSize: 36, fontWeight: FontWeight.bold)),
                 ],
               ),
               if (_getPrecipitationIcon() != null) _buildWeatherIcon(_getPrecipitationIcon()!),
@@ -111,8 +111,8 @@ class CurrentWeatherWidget extends StatelessWidget {
   Widget _buildWeatherIcon(String url) {
     return Image(
       image: NetworkImage(url),
-      width: 50,
-      height: 50,
+      width: 150,
+      height: 150,
       loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) {
           return child;
