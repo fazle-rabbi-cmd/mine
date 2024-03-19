@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Weather> dailyForecast = [];
   List<Weather> hourlyForecast = [];
   String locationName = '';
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -58,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchWeatherData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final locationService = LocationService();
     final weatherService = WeatherService(widget.apiKey);
 
@@ -73,9 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
         locationName = currentWeatherData.locationName!;
         dailyForecast = dailyForecastData;
         hourlyForecast = hourlyForecastData;
+        isLoading = false;
       });
     }
   }
+
   Future<void> fetchWeatherDataForDate(DateTime selectedDate) async {
     try {
       final locationService = LocationService();
@@ -85,8 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final lat = position.latitude;
       final lon = position.longitude;
 
-      final weatherData =
-      await weatherService.getWeatherForDate(lat, lon, selectedDate);
+      final weatherData = await weatherService.getWeatherForDate(lat, lon, selectedDate);
 
       setState(() {
         currentWeather = weatherData;
@@ -145,48 +151,54 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weather Forecast'),
+        title: Text(
+          'Weather Forecast',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, color: Colors.white),
             onPressed: () => showSearchScreen(context),
           ),
           IconButton(
-            icon: Icon(Icons.calendar_today),
+            icon: Icon(Icons.calendar_today, color: Colors.white),
             onPressed: _showDatePickerDialog,
           ),
           IconButton(
-            icon: Icon(Icons.info),
+            icon: Icon(Icons.info, color: Colors.white),
             onPressed: () => _showRecommendation(context),
           ),
         ],
+        backgroundColor: Colors.lightBlueAccent, // Change app bar color
+        elevation: 0, // Remove app bar elevation
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.black),
+              decoration: BoxDecoration(color: Colors.blue),
               child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
             ListTile(
               leading: Icon(Icons.history),
-              title: Text('Past Weather'),
+              title: Text('Past Weather', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PastWeatherScreen())),
             ),
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              title: Text('Settings', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen())),
             ),
             ListTile(
               leading: Icon(Icons.event),
-              title: Text('Weather Events'),
+              title: Text('Weather Events', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherEventsScreen())),
             ),
+
             ListTile(
               leading: Icon(Icons.feedback),
-              title: Text('Feedback'),
+              title: Text('Feedback',style: TextStyle(fontSize: 16)),
               onTap: () {
                 // Navigate to feedback screen or perform necessary actions
               },
@@ -199,22 +211,30 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName),
-            SizedBox(height: 20),
-            CropSuggestionWidget(
-              temperature: currentWeather.temperature,
-              humidity: double.tryParse(currentWeather.humidity.toString()) ?? 0,
-              precipitationType: currentWeather.precipitationType,
-              precipitationAmount: double.tryParse(currentWeather.precipitationAmount.toString()) ?? 0,
-            ),
-            SizedBox(height: 20),
-            HourlyForecastWidget(hourlyForecast: hourlyForecast),
-            SizedBox(height: 20),
-            DailyForecastWidget(dailyForecast: dailyForecast),
-            SizedBox(height: 20),
+            if (isLoading) // Show loading indicator if data is being fetched
+              Center(child: CircularProgressIndicator()),
+            if (!isLoading) // Show content only when not loading
+              Column(
+                children: [
+                  CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName),
+                  SizedBox(height: 20),
+                  CropSuggestionWidget(
+                    temperature: currentWeather.temperature,
+                    humidity: double.tryParse(currentWeather.humidity.toString()) ?? 0,
+                    precipitationType: currentWeather.precipitationType,
+                    precipitationAmount: double.tryParse(currentWeather.precipitationAmount.toString()) ?? 0,
+                  ),
+                  SizedBox(height: 20),
+                  HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                  SizedBox(height: 20),
+                  DailyForecastWidget(dailyForecast: dailyForecast),
+                  SizedBox(height: 20),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
+
 }
