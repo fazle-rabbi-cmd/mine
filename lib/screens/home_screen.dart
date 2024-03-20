@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => _showRecommendation(context),
           ),
         ],
-        backgroundColor: Colors.lightBlueAccent, // Change app bar color
+        backgroundColor: Colors.lightBlueAccent[200], // AccuWeather color
         elevation: 0, // Remove app bar elevation
       ),
       drawer: Drawer(
@@ -177,28 +177,27 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Colors.blueGrey[800]), // AccuWeather color
               child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
             ListTile(
-              leading: Icon(Icons.history),
+              leading: Icon(Icons.history, color: Colors.blueGrey[800]), // AccuWeather color
               title: Text('Past Weather', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PastWeatherScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.settings),
+              leading: Icon(Icons.settings, color: Colors.blueGrey[800]), // AccuWeather color
               title: Text('Settings', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.event),
+              leading: Icon(Icons.event, color: Colors.blueGrey[800]), // AccuWeather color
               title: Text('Weather Events', style: TextStyle(fontSize: 16)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherEventsScreen())),
             ),
-
             ListTile(
-              leading: Icon(Icons.feedback),
-              title: Text('Feedback',style: TextStyle(fontSize: 16)),
+              leading: Icon(Icons.feedback, color: Colors.blueGrey[800]), // AccuWeather color
+              title: Text('Feedback', style: TextStyle(fontSize: 16)),
               onTap: () {
                 // Navigate to feedback screen or perform necessary actions
               },
