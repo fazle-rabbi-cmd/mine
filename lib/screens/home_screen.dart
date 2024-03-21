@@ -38,20 +38,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _requestLocationPermission() async {
-    final PermissionStatus permissionStatus = await Permission.location.request();
+    final PermissionStatus permissionStatus = await Permission.location
+        .request();
     if (permissionStatus.isDenied) {
       showDialog(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: Text('Location Permission Required'),
-          content: Text('To provide accurate weather forecast, please grant location permission.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => openAppSettings(),
-              child: Text('Open Settings'),
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: Text('Location Permission Required'),
+              content: Text(
+                  'To provide accurate weather forecast, please grant location permission.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => openAppSettings(),
+                  child: Text('Open Settings'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     } else if (permissionStatus.isGranted) {
       _fetchWeatherData();
@@ -69,9 +72,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final permissionStatus = await Permission.location.request();
     if (permissionStatus.isGranted) {
       final position = await locationService.getCurrentLocation();
-      final currentWeatherData = await weatherService.getCurrentWeather(position.latitude, position.longitude);
-      final dailyForecastData = await weatherService.getDailyForecast(position.latitude, position.longitude);
-      final hourlyForecastData = await weatherService.getHourlyForecast(position.latitude, position.longitude);
+      final currentWeatherData = await weatherService.getCurrentWeather(
+          position.latitude, position.longitude);
+      final dailyForecastData = await weatherService.getDailyForecast(
+          position.latitude, position.longitude);
+      final hourlyForecastData = await weatherService.getHourlyForecast(
+          position.latitude, position.longitude);
 
       setState(() {
         currentWeather = currentWeatherData;
@@ -92,7 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final lat = position.latitude;
       final lon = position.longitude;
 
-      final weatherData = await weatherService.getWeatherForDate(lat, lon, selectedDate);
+      final weatherData = await weatherService.getWeatherForDate(
+          lat, lon, selectedDate);
 
       setState(() {
         currentWeather = weatherData;
@@ -113,17 +120,19 @@ class _HomeScreenState extends State<HomeScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SearchScreen(
-          apiKey: widget.apiKey,
-          updateWeather: (Weather weather, List<Weather> dailyForecast, List<Weather> hourlyForecast, String locationName) {
-            setState(() {
-              currentWeather = weather;
-              this.dailyForecast = dailyForecast;
-              this.hourlyForecast = hourlyForecast;
-              this.locationName = locationName;
-            });
-          },
-        ),
+        builder: (context) =>
+            SearchScreen(
+              apiKey: widget.apiKey,
+              updateWeather: (Weather weather, List<Weather> dailyForecast,
+                  List<Weather> hourlyForecast, String locationName) {
+                setState(() {
+                  currentWeather = weather;
+                  this.dailyForecast = dailyForecast;
+                  this.hourlyForecast = hourlyForecast;
+                  this.locationName = locationName;
+                });
+              },
+            ),
       ),
     );
   }
@@ -131,19 +140,20 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showRecommendation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text('Recommendations'),
-        content: RecommendationWidget(
-          airQualityIndex: currentWeather.aqi?.toDouble() ?? 0,
-          uvIndex: currentWeather.uvIndex?.toDouble() ?? 0,
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Close'),
+      builder: (BuildContext context) =>
+          AlertDialog(
+            title: Text('Recommendations'),
+            content: RecommendationWidget(
+              airQualityIndex: currentWeather.aqi?.toDouble() ?? 0,
+              uvIndex: currentWeather.uvIndex?.toDouble() ?? 0,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -177,26 +187,38 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blueGrey[800]), // AccuWeather color
-              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+              decoration: BoxDecoration(color: Colors.blueGrey[800]),
+              // AccuWeather color
+              child: Text(
+                  'Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
             ListTile(
-              leading: Icon(Icons.history, color: Colors.blueGrey[800]), // AccuWeather color
+              leading: Icon(Icons.history, color: Colors.blueGrey[800]),
+              // AccuWeather color
               title: Text('Past Weather', style: TextStyle(fontSize: 16)),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => PastWeatherScreen())),
+              onTap: () =>
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => PastWeatherScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.settings, color: Colors.blueGrey[800]), // AccuWeather color
+              leading: Icon(Icons.settings, color: Colors.blueGrey[800]),
+              // AccuWeather color
               title: Text('Settings', style: TextStyle(fontSize: 16)),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen())),
+              onTap: () =>
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => SettingsScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.event, color: Colors.blueGrey[800]), // AccuWeather color
+              leading: Icon(Icons.event, color: Colors.blueGrey[800]),
+              // AccuWeather color
               title: Text('Weather Events', style: TextStyle(fontSize: 16)),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherEventsScreen())),
+              onTap: () =>
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => WeatherEventsScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.feedback, color: Colors.blueGrey[800]), // AccuWeather color
+              leading: Icon(Icons.feedback, color: Colors.blueGrey[800]),
+              // AccuWeather color
               title: Text('Feedback', style: TextStyle(fontSize: 16)),
               onTap: () {
                 // Navigate to feedback screen or perform necessary actions
@@ -215,13 +237,16 @@ class _HomeScreenState extends State<HomeScreen> {
             if (!isLoading) // Show content only when not loading
               Column(
                 children: [
-                  CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName),
+                  CurrentWeatherWidget(currentWeather: currentWeather,
+                      locationName: locationName),
                   SizedBox(height: 20),
                   CropSuggestionWidget(
                     temperature: currentWeather.temperature,
-                    humidity: double.tryParse(currentWeather.humidity.toString()) ?? 0,
+                    humidity: double.tryParse(
+                        currentWeather.humidity.toString()) ?? 0,
                     precipitationType: currentWeather.precipitationType,
-                    precipitationAmount: double.tryParse(currentWeather.precipitationAmount.toString()) ?? 0,
+                    precipitationAmount: double.tryParse(
+                        currentWeather.precipitationAmount.toString()) ?? 0,
                   ),
                   SizedBox(height: 20),
                   HourlyForecastWidget(hourlyForecast: hourlyForecast),
@@ -235,5 +260,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }
