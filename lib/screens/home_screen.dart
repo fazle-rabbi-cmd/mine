@@ -29,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Weather> hourlyForecast = [];
   String locationName = '';
   bool isLoading = false;
+  bool showHourlyForecast = false;
+  bool showDailyForecast = false;
+  bool showCropSuggestions = false;
 
   @override
   void initState() {
@@ -240,22 +243,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   CurrentWeatherWidget(currentWeather: currentWeather,
                       locationName: locationName),
                   SizedBox(height: 20),
-                  CropSuggestionWidget(
-                    temperature: currentWeather.temperature,
-                    humidity: double.tryParse(
-                        currentWeather.humidity.toString()) ?? 0,
-                    precipitationType: currentWeather.precipitationType,
-                    precipitationAmount: double.tryParse(
-                        currentWeather.precipitationAmount.toString()) ?? 0,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showCropSuggestions = !showCropSuggestions;
+                          });
+                        },
+                        child: Text(showCropSuggestions ? 'Hide Crop Suggestions' : 'Show Crop Suggestions'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showHourlyForecast = !showHourlyForecast;
+                          });
+                        },
+                        child: Text(showHourlyForecast ? 'Hide Hourly Forecast' : 'Show Hourly Forecast'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showDailyForecast = !showDailyForecast;
+                          });
+                        },
+                        child: Text(showDailyForecast ? 'Hide Daily Forecast' : 'Show Daily Forecast'),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
-                  HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                  // Crop suggestions widget
+                  Visibility(
+                    visible: showCropSuggestions,
+                    child: CropSuggestionWidget(
+                      temperature: currentWeather.temperature,
+                      humidity: double.tryParse(currentWeather.humidity.toString()) ?? 0,
+                      precipitationType: currentWeather.precipitationType,
+                      precipitationAmount: double.tryParse(currentWeather.precipitationAmount.toString()) ?? 0,
+                    ),
+                  ),
                   SizedBox(height: 20),
-                  DailyForecastWidget(dailyForecast: dailyForecast),
+                  // Hourly forecast widget
+                  Visibility(
+                    visible: showHourlyForecast,
+                    child: HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                  ),
+                  SizedBox(height: 20),
+                  // Daily forecast widget
+                  Visibility(
+                    visible: showDailyForecast,
+                    child: DailyForecastWidget(dailyForecast: dailyForecast),
+                  ),
                   SizedBox(height: 20),
                 ],
               ),
-          ],
+                ],
+
         ),
       ),
     );
