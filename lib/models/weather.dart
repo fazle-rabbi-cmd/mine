@@ -5,11 +5,11 @@ class Weather {
   final String? precipitationAmount;
   final double? windSpeed;
   final String? windDirection;
-  final int? humidity;
-  final int? chanceOfRain;
-  final int? aqi;
-  final int? uvIndex;
-  final int? pressure;
+  final double? humidity;
+  final double? chanceOfRain;
+  final double? aqi;
+  final double? uvIndex;
+  final double? pressure;
   final double? visibility;
   final String? sunriseTime;
   final String? sunsetTime;
@@ -45,26 +45,29 @@ class Weather {
 
   static Weather fromJson(Map<String, dynamic> data) {
     return Weather(
-      temperature: data['temp'].toDouble() ?? 0.0,
-      feelsLikeTemperature: data['app_temp'] ?? 0.0,
+      temperature: data['temp']?.toDouble() ?? 0.0,
+      feelsLikeTemperature: data['app_temp']?.toDouble() ?? 0.0,
       precipitationType: data['weather']['description'] ?? '',
       precipitationAmount: data['precip']?.toString() ?? '',
-      windSpeed: data['wind_spd'] ?? 0.0,
+      windSpeed: data['wind_spd']?.toDouble() ?? 0.0,
       windDirection: data['wind_cdir_full'] ?? '',
-      humidity: data['rh'] ?? 0,
-      chanceOfRain: data['pop'] ?? 0,
-      aqi: data['aqi'] ?? 0,
-      uvIndex: data['uv']?.round() ?? 0,
-      pressure: data['pres']?.round() ?? 0,
-      visibility: data['vis'] ?? 0.0,
+      humidity: data['rh']?.toDouble() ?? 0.0,
+      chanceOfRain: data['pop']?.toDouble() ?? 0.0,
+      aqi: data['aqi']?.toDouble() ?? 0.0,
+      uvIndex: data['uv']?.toDouble()  ?? 0.0,
+      pressure: data['pres']?.toDouble() ?? 0.0,
+      visibility: data['vis']?.toDouble() ?? 0.0,
       sunriseTime: data['sunrise'] ?? '',
       sunsetTime: data['sunset'] ?? '',
       locationName: data['city_name'] ?? '',
       zone: data['timezone'] ?? '',
-      latitude: data['lat'] ?? 0.0,
-      longitude: data['lon'] ?? 0.0,
-      weatherIconCode: data['weather']['icon'] ?? '', // Assign weather icon code
+      latitude: data['lat']?.toDouble() ?? 0.0,
+      longitude: data['lon']?.toDouble() ?? 0.0,
+      weatherIconCode: data['weather']['icon'] ?? '',
       time: data['time'] != null ? DateTime.parse(data['time']) : null,
     );
   }
+
+
+
 }

@@ -41,28 +41,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _requestLocationPermission() async {
-    final PermissionStatus permissionStatus = await Permission.location
-        .request();
+    final PermissionStatus permissionStatus = await Permission.location.status;
     if (permissionStatus.isDenied) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: Text('Location Permission Required'),
-              content: Text(
-                  'To provide accurate weather forecast, please grant location permission.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => openAppSettings(),
-                  child: Text('Open Settings'),
-                ),
-              ],
-            ),
-      );
+      // Request permission if it's not already granted
+      final PermissionStatus newPermissionStatus = await Permission.location.request();
+      if (newPermissionStatus.isGranted) {
+        // Permission granted, proceed with fetching weather data
+        _fetchWeatherData();
+      } else if (newPermissionStatus.isPermanentlyDenied) {
+        // If the permission is permanently denied, open the app settings
+        openAppSettings();
+      }
     } else if (permissionStatus.isGranted) {
+      // If permission is already granted, proceed with fetching weather data
       _fetchWeatherData();
     }
   }
+
 
   Future<void> _fetchWeatherData() async {
     setState(() {
@@ -72,25 +67,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final locationService = LocationService();
     final weatherService = WeatherService(widget.apiKey);
 
-    final permissionStatus = await Permission.location.request();
-    if (permissionStatus.isGranted) {
-      final position = await locationService.getCurrentLocation();
-      final currentWeatherData = await weatherService.getCurrentWeather(
-          position.latitude, position.longitude);
-      final dailyForecastData = await weatherService.getDailyForecast(
-          position.latitude, position.longitude);
-      final hourlyForecastData = await weatherService.getHourlyForecast(
-          position.latitude, position.longitude);
+    // Assuming permission has already been requested and granted
+    // Proceed directly to fetching weather data if permission is granted
+    final position = await locationService.getCurrentLocation();
+    final currentWeatherData =  await weatherService.getCurrentWeather(
+        position.latitude, position.longitude);
+    final dailyForecastData = await weatherService.getDailyForecast(
+        position.latitude, position.longitude);
+    final hourlyForecastData = await weatherService.getHourlyForecast(
+        position.latitude, position.longitude);
 
-      setState(() {
-        currentWeather = currentWeatherData;
-        locationName = currentWeatherData.locationName!;
-        dailyForecast = dailyForecastData;
-        hourlyForecast = hourlyForecastData;
-        isLoading = false;
-      });
-    }
+    setState(() {
+      currentWeather = currentWeatherData;
+      locationName = currentWeatherData.locationName!;
+      dailyForecast = dailyForecastData;
+      hourlyForecast = hourlyForecastData;
+      isLoading = false;
+    });
   }
+
 
   Future<void> fetchWeatherDataForDate(DateTime selectedDate) async {
     try {
@@ -243,8 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   CurrentWeatherWidget(currentWeather: currentWeather,
                       locationName: locationName),
                   SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -253,7 +248,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         child: Text(showCropSuggestions ? 'Hide Crop Suggestions' : 'Show Crop Suggestions'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlueAccent),
                       ),
+                      SizedBox(height: 10), // Add some space between the buttons
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -261,7 +258,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         child: Text(showHourlyForecast ? 'Hide Hourly Forecast' : 'Show Hourly Forecast'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlueAccent),
                       ),
+                      SizedBox(height: 10), // Add some space between the buttons
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -269,9 +268,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         child: Text(showDailyForecast ? 'Hide Daily Forecast' : 'Show Daily Forecast'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlueAccent),
                       ),
                     ],
                   ),
+
                   SizedBox(height: 20),
                   // Crop suggestions widget
                   Visibility(
