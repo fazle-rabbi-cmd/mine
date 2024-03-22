@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
       builder: (context, themeNotifier, child) {
         return MaterialApp(
           title: 'Weather Forecast App',
+          debugShowCheckedModeBanner: false,
           theme: themeNotifier
               .currentTheme, // Use the current theme from ThemeNotifier
           home: HomeScreen(

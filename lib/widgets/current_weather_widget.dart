@@ -24,7 +24,7 @@ class CurrentWeatherWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                locationName != null ? 'Current Weather in $locationName' : 'Current Weather',
+                locationName != null ? '$locationName' : 'Current Weather',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               SizedBox(height: 10),

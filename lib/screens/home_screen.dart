@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Weather Forecast',
+          'Nimbus',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
