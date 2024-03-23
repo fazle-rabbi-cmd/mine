@@ -52,7 +52,7 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
                 _selectedElement = newValue!;
               });
             },
-            items: <String>['Temperature', 'Humidity', 'Pressure', 'Chance of Rain']
+            items: <String>['Temperature', 'Humidity', 'Pressure', 'Chance of Rain', 'All']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -70,7 +70,38 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
               child: LineChart(
                 LineChartData(
                   borderData: FlBorderData(show: false),
-                  lineBarsData: [
+                  lineBarsData: _selectedElement == 'All'
+                      ? [
+                    LineChartBarData(
+                      spots: _generateSpots(widget.hourlyForecast, 'Temperature'),
+                      isCurved: true,
+                      color: Colors.blue,
+                      barWidth: 4,
+                      dotData: FlDotData(show: false),
+                    ),
+                    LineChartBarData(
+                      spots: _generateSpots(widget.hourlyForecast, 'Humidity'),
+                      isCurved: true,
+                      color: Colors.green,
+                      barWidth: 4,
+                      dotData: FlDotData(show: false),
+                    ),
+                    LineChartBarData(
+                      spots: _generateSpots(widget.hourlyForecast, 'Pressure'),
+                      isCurved: true,
+                      color: Colors.red,
+                      barWidth: 4,
+                      dotData: FlDotData(show: false),
+                    ),
+                    LineChartBarData(
+                      spots: _generateSpots(widget.hourlyForecast, 'Chance of Rain'),
+                      isCurved: true,
+                      color: Colors.orange,
+                      barWidth: 4,
+                      dotData: FlDotData(show: false),
+                    ),
+                  ]
+                      : [
                     LineChartBarData(
                       spots: _generateSpots(widget.hourlyForecast, _selectedElement),
                       isCurved: true,
