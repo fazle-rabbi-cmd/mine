@@ -47,6 +47,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
             'Feels Like ${_getValueOrNA(widget.currentWeather.feelsLikeTemperature)}°C',
             style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
+
           const SizedBox(height: 10),
           Text(
             '${_getPrecipitation()}',
