@@ -18,7 +18,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -29,32 +29,32 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
         children: [
           Text(
             widget.locationName,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 '${widget.currentWeather.temperature}°C',
-                style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.black),
+                style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.black),
               ),
               if (_getPrecipitationIcon() != null) _buildWeatherIcon(_getPrecipitationIcon()!),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             'Feels Like ${_getValueOrNA(widget.currentWeather.feelsLikeTemperature)}°C',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             '${_getPrecipitation()}',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
           ),
-          SizedBox(height: 20),
-          Divider(thickness: 1.5, color: Colors.grey[300]),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
+          const Divider(thickness: 1.5, color: Colors.grey),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -63,42 +63,46 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
             },
             child: Text(
               _isDetailedInfoVisible ? 'Hide Details' : 'Show Details',
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
             ),
           ),
-          if (_isDetailedInfoVisible) ...[
-
-
-            _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
-            _buildWeatherInfo('Humidity', _getValueOrNA(widget.currentWeather.humidity), '%', Icons.water_drop),
-            _buildWeatherInfo('Chance of Rain', _getValueOrNA(widget.currentWeather.chanceOfRain), '%', Icons.beach_access),
-            _buildWeatherInfo('AQI', _getValueOrNA(widget.currentWeather.aqi), '', Icons.air),
-            _buildWeatherInfo('UV Index', _getValueOrNA(widget.currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
-            _buildWeatherInfo('Pressure', _getValueOrNA(widget.currentWeather.pressure), 'hPa', Icons.compress),
-            _buildWeatherInfo('Visibility', _getValueOrNA(widget.currentWeather.visibility), 'km', Icons.visibility_outlined),
-            _buildWeatherInfo('Sunrise Time', widget.currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
-            _buildWeatherInfo('Sunset Time', widget.currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
-          ],
+          Visibility(
+            visible: _isDetailedInfoVisible,
+            child: Column(
+              children: [
+                _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
+                _buildWeatherInfo('Humidity', _getValueOrNA(widget.currentWeather.humidity), '%', Icons.water_drop),
+                _buildWeatherInfo('Chance of Rain', _getValueOrNA(widget.currentWeather.chanceOfRain), '%', Icons.beach_access),
+                _buildWeatherInfo('AQI', _getValueOrNA(widget.currentWeather.aqi), '', Icons.air),
+                _buildWeatherInfo('UV Index', _getValueOrNA(widget.currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
+                _buildWeatherInfo('Pressure', _getValueOrNA(widget.currentWeather.pressure), 'hPa', Icons.compress),
+                _buildWeatherInfo('Visibility', _getValueOrNA(widget.currentWeather.visibility), 'km', Icons.visibility_outlined),
+                _buildWeatherInfo('Sunrise Time', widget.currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
+                _buildWeatherInfo('Sunset Time', widget.currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
   Widget _buildWeatherInfo(String label, String value, String unit, IconData iconData) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(iconData, color: Colors.blue[300], size: 24),
-          SizedBox(width: 10),
-          Text('$label: $value$unit', style: TextStyle(color: Colors.black, fontSize: 16)),
+          const SizedBox(width: 10),
+          Text('$label: $value$unit', style: const TextStyle(color: Colors.black, fontSize: 16)),
         ],
       ),
     );
   }
 
   Widget _buildWeatherIcon(String url) {
-    return Image(
-      image: NetworkImage(url),
+    return Image.network(
+      url,
       width: 100,
       height: 100,
       loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
@@ -111,7 +115,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
         }
       },
       errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-        return Icon(Icons.error); // Placeholder icon for error
+        return const Icon(Icons.error); // Placeholder icon for error
       },
     );
   }

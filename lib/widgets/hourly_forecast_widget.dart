@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
 
 class HourlyForecastWidget extends StatefulWidget {
@@ -34,7 +35,6 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
           ),
         ),
         SizedBox(height: 8),
-        // Dropdown Menu
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: DropdownButton<String>(
@@ -52,7 +52,7 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
                 _selectedElement = newValue!;
               });
             },
-            items: <String>['Temperature', 'Humidity', 'Pressure', 'Chance of Rain', 'All']
+            items: <String>['Temperature', 'Humidity', 'Pressure', 'Chance of Rain']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -70,46 +70,7 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
               child: LineChart(
                 LineChartData(
                   borderData: FlBorderData(show: false),
-                  lineBarsData: _selectedElement == 'All'
-                      ? [
-                    LineChartBarData(
-                      spots: _generateSpots(widget.hourlyForecast, 'Temperature'),
-                      isCurved: true,
-                      color: Colors.blue,
-                      barWidth: 4,
-                      dotData: FlDotData(show: false),
-                    ),
-                    LineChartBarData(
-                      spots: _generateSpots(widget.hourlyForecast, 'Humidity'),
-                      isCurved: true,
-                      color: Colors.green,
-                      barWidth: 4,
-                      dotData: FlDotData(show: false),
-                    ),
-                    LineChartBarData(
-                      spots: _generateSpots(widget.hourlyForecast, 'Pressure'),
-                      isCurved: true,
-                      color: Colors.red,
-                      barWidth: 4,
-                      dotData: FlDotData(show: false),
-                    ),
-                    LineChartBarData(
-                      spots: _generateSpots(widget.hourlyForecast, 'Chance of Rain'),
-                      isCurved: true,
-                      color: Colors.orange,
-                      barWidth: 4,
-                      dotData: FlDotData(show: false),
-                    ),
-                  ]
-                      : [
-                    LineChartBarData(
-                      spots: _generateSpots(widget.hourlyForecast, _selectedElement),
-                      isCurved: true,
-                      color: Colors.blue,
-                      barWidth: 4,
-                      dotData: FlDotData(show: false),
-                    ),
-                  ],
+                  lineBarsData: _generateLineChartBarData(),
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
                       tooltipBgColor: Colors.blue.withOpacity(0.8),
@@ -127,18 +88,25 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
                   ),
                   minY: 0,
                   gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(),
                 ),
               ),
             ),
           ),
         ),
-        // Legend
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(Icons.circle, color: Colors.blue, size: 16),
+              if (_selectedElement == 'Temperature')
+                Icon(Icons.thermostat, color: Colors.blue, size: 16),
+              if (_selectedElement == 'Humidity')
+                Icon(Icons.water_drop, color: Colors.blue, size: 16),
+              if (_selectedElement == 'Pressure')
+                Icon(Icons.bar_chart, color: Colors.blue, size: 16),
+              if (_selectedElement == 'Chance of Rain')
+                Icon(Icons.umbrella, color: Colors.blue, size: 16),
               SizedBox(width: 4),
               Text(_selectedElement, style: TextStyle(fontSize: 16)),
             ],
@@ -161,6 +129,18 @@ class _HourlyForecastWidgetState extends State<HourlyForecastWidget> {
       default:
         return 'N/A';
     }
+  }
+
+  List<LineChartBarData> _generateLineChartBarData() {
+    return [
+      LineChartBarData(
+        spots: _generateSpots(widget.hourlyForecast, _selectedElement),
+        isCurved: true,
+        color: Colors.blue,
+        barWidth: 4,
+        dotData: FlDotData(show: false),
+      ),
+    ];
   }
 
   List<FlSpot> _generateSpots(List<Weather> hourlyForecast, String element) {
