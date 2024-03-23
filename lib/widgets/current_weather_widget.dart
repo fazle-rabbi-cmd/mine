@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mine/models/weather.dart';
 
-class CurrentWeatherWidget extends StatelessWidget {
+class CurrentWeatherWidget extends StatefulWidget {
   final Weather currentWeather;
   final String locationName;
 
   const CurrentWeatherWidget({Key? key, required this.currentWeather, required this.locationName}) : super(key: key);
+
+  @override
+  _CurrentWeatherWidgetState createState() => _CurrentWeatherWidgetState();
+}
+
+class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
+  bool _isDetailedInfoVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -20,81 +27,62 @@ class CurrentWeatherWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                locationName != null ? '$locationName' : 'Current Weather',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-              SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.calendar_today, color: Colors.grey[600], size: 28),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Date', style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 5),
-                      Text('${_formatDate(DateTime.now())}', style: TextStyle(color: Colors.black, fontSize: 14)),
-                    ],
-                  ),
-                  SizedBox(width: 20),
-                  Icon(Icons.access_time, color: Colors.grey[600], size: 28),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Time', style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 5),
-                      Text('${_formatTime(DateTime.now())}', style: TextStyle(color: Colors.black, fontSize: 14)),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+          Text(
+            widget.locationName,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
           ),
           SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Temperature', style: TextStyle(color: Colors.grey[600], fontSize: 20)),
-                  SizedBox(height: 5),
-                  Text('${currentWeather.temperature}°C', style: TextStyle(color: Colors.red, fontSize: 36, fontWeight: FontWeight.bold)),
-                ],
+              Text(
+                '${widget.currentWeather.temperature}°C',
+                style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.black),
               ),
               if (_getPrecipitationIcon() != null) _buildWeatherIcon(_getPrecipitationIcon()!),
             ],
           ),
           SizedBox(height: 20),
+          Text(
+            'Feels Like ${_getValueOrNA(widget.currentWeather.feelsLikeTemperature)}°C',
+            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+          ),
+          SizedBox(height: 10),
+          Text(
+            '${_getPrecipitation()}',
+            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+          ),
+          SizedBox(height: 20),
           Divider(thickness: 1.5, color: Colors.grey[300]),
           SizedBox(height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWeatherInfo('Feels Like', _getValueOrNA(currentWeather.feelsLikeTemperature), '°C', Icons.thermostat_rounded),
-              _buildWeatherInfo('Precipitation', _getPrecipitation(), '', Icons.water_outlined),
-              _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
-              _buildWeatherInfo('Humidity', _getValueOrNA(currentWeather.humidity), '%', Icons.water_drop),
-              _buildWeatherInfo('Chance of Rain', _getValueOrNA(currentWeather.chanceOfRain), '%', Icons.beach_access),
-              _buildWeatherInfo('AQI', _getValueOrNA(currentWeather.aqi), '', Icons.air),
-              _buildWeatherInfo('UV Index', _getValueOrNA(currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
-              _buildWeatherInfo('Pressure', _getValueOrNA(currentWeather.pressure), 'hPa', Icons.compress),
-              _buildWeatherInfo('Visibility', _getValueOrNA(currentWeather.visibility), 'km', Icons.visibility_outlined),
-              _buildWeatherInfo('Sunrise Time', currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
-              _buildWeatherInfo('Sunset Time', currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
-            ],
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _isDetailedInfoVisible = !_isDetailedInfoVisible;
+              });
+            },
+            child: Text(
+              _isDetailedInfoVisible ? 'Hide Details' : 'Show Details',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
+          if (_isDetailedInfoVisible) ...[
+
+
+            _buildWeatherInfo('Wind Speed', _getWindSpeed(), '', Icons.air_outlined),
+            _buildWeatherInfo('Humidity', _getValueOrNA(widget.currentWeather.humidity), '%', Icons.water_drop),
+            _buildWeatherInfo('Chance of Rain', _getValueOrNA(widget.currentWeather.chanceOfRain), '%', Icons.beach_access),
+            _buildWeatherInfo('AQI', _getValueOrNA(widget.currentWeather.aqi), '', Icons.air),
+            _buildWeatherInfo('UV Index', _getValueOrNA(widget.currentWeather.uvIndex), '', Icons.wb_iridescent_rounded),
+            _buildWeatherInfo('Pressure', _getValueOrNA(widget.currentWeather.pressure), 'hPa', Icons.compress),
+            _buildWeatherInfo('Visibility', _getValueOrNA(widget.currentWeather.visibility), 'km', Icons.visibility_outlined),
+            _buildWeatherInfo('Sunrise Time', widget.currentWeather.sunriseTime ?? 'N/A', '', Icons.wb_sunny_outlined),
+            _buildWeatherInfo('Sunset Time', widget.currentWeather.sunsetTime ?? 'N/A', '', Icons.nightlight_round),
+          ],
         ],
       ),
     );
   }
-
   Widget _buildWeatherInfo(String label, String value, String unit, IconData iconData) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
@@ -111,8 +99,8 @@ class CurrentWeatherWidget extends StatelessWidget {
   Widget _buildWeatherIcon(String url) {
     return Image(
       image: NetworkImage(url),
-      width: 150,
-      height: 150,
+      width: 100,
+      height: 100,
       loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) {
           return child;
@@ -129,27 +117,19 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   String _getPrecipitation() {
-    return currentWeather.precipitationType ?? 'N/A';
+    return widget.currentWeather.precipitationType ?? 'N/A';
   }
 
   String _getWindSpeed() {
-    if (currentWeather.windSpeed != null && currentWeather.windDirection != null) {
-      return '${currentWeather.windSpeed} km/h ${currentWeather.windDirection}';
-    } else if (currentWeather.windSpeed != null) {
-      return '${currentWeather.windSpeed} ';
-    } else if (currentWeather.windDirection != null) {
-      return currentWeather.windDirection!;
+    if (widget.currentWeather.windSpeed != null && widget.currentWeather.windDirection != null) {
+      return '${widget.currentWeather.windSpeed} km/h ${widget.currentWeather.windDirection}';
+    } else if (widget.currentWeather.windSpeed != null) {
+      return '${widget.currentWeather.windSpeed} ';
+    } else if (widget.currentWeather.windDirection != null) {
+      return widget.currentWeather.windDirection!;
     } else {
       return 'N/A';
     }
-  }
-
-  String _formatTime(DateTime? time) {
-    return time != null ? DateFormat.Hm().format(time) : 'N/A';
-  }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('EEE, MMM d, yyyy').format(date);
   }
 
   String _getValueOrNA(dynamic value) {
@@ -157,8 +137,8 @@ class CurrentWeatherWidget extends StatelessWidget {
   }
 
   String? _getPrecipitationIcon() {
-    if (currentWeather.weatherIconCode != null) {
-      String iconCode = currentWeather.weatherIconCode!;
+    if (widget.currentWeather.weatherIconCode != null) {
+      String iconCode = widget.currentWeather.weatherIconCode!;
       return "https://www.weatherbit.io/static/img/icons/$iconCode.png";
     }
     return null;
