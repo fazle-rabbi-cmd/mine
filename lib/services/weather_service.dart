@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:mine/models/weather.dart';
 
@@ -113,11 +112,26 @@ class WeatherService {
     try {
       // Fetch historical weather data for the specified date
       final historicalWeather =
-          await weatherService.getHistoricalWeather(lat, lon, selectedDate);
+      await weatherService.getHistoricalWeather(lat, lon, selectedDate);
       return historicalWeather;
     } catch (e) {
       print('Error fetching weather data for date: $e');
       rethrow; // Rethrow the exception for error handling in the UI
+    }
+  }
+
+  // New method for fetching location suggestions
+  Future<List<dynamic>> getLocationSuggestions(String query) async {
+    try {
+      final response = await http.get(Uri.parse('https://nominatim.openstreetmap.org/search?format=json&q=$query'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to load location suggestions');
+      }
+    } catch (e) {
+      print('Error fetching location suggestions: $e');
+      rethrow;
     }
   }
 }
