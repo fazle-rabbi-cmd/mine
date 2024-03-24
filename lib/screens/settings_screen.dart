@@ -9,32 +9,19 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Variables to store user preferences
   bool _isCelsiusSelected = true;
   String _selectedLanguage = 'English';
-  bool _isNotificationEnabled = true; // Default value for notifications
+  bool _isNotificationEnabled = true;
   bool _isDarkThemeEnabled = false;
   String _selectedRefreshInterval = 'Every 30 minutes';
+  late final NotificationService notificationService;
 
-  // Create an instance of NotificationService
-  NotificationService notificationService = NotificationService();
-
-  // Method to handle notification toggle
-  void _handleNotificationToggle(bool value) {
-    setState(() {
-      _isNotificationEnabled = value;
-    });
-    if (value) {
-      // If notifications are enabled, trigger notification logic
-      _triggerSevereWeatherAlertNotification();
-    }
-  }
-
-  // Method to trigger severe weather alert notification
-  void _triggerSevereWeatherAlertNotification() {
-    // Implement logic to send notification for severe weather alerts
-    // Example:
-    notificationService.sendSevereWeatherAlertNotification();
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the notification service here
+    notificationService = NotificationService();
+    notificationService.initialize();
   }
 
   @override
@@ -44,35 +31,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text('Settings'),
       ),
       body: ListView(
+        padding: EdgeInsets.all(16),
         children: [
-          _buildSectionHeader('Units'),
-          _buildUnitSelection(),
-          _buildSectionHeader('Language'),
-          _buildLanguageSelection(),
-          _buildSectionHeader('Notification Preferences'),
-          _buildNotificationPreferences(),
-          _buildSectionHeader('Data Refresh Intervals'),
-          _buildRefreshIntervalSelection(),
-          _buildSectionHeader('Theme Change'),
-          _buildThemeSwitch(),
+          _buildSection('Units', _buildUnitSelection()),
+          _buildSection('Language', _buildLanguageSelection()),
+          _buildSection('Notification Preferences', _buildNotificationPreferences()),
+          _buildSection('Data Refresh Intervals', _buildRefreshIntervalSelection()),
+          _buildSection('Theme Change', _buildThemeSwitch()),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget _buildSection(String title, Widget content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
+        content,
+      ],
     );
   }
 
+  // Include other widget build methods (_buildUnitSelection, _buildLanguageSelection, etc.) here
+  // No changes needed in these methods for the notification feature
   Widget _buildUnitSelection() {
     return ListTile(
       title: Text('Temperature Units'),
@@ -83,13 +71,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _isCelsiusSelected = newValue == 'Celsius';
           });
         },
-        items: <String>['Celsius', 'Fahrenheit']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
+        items: ['Celsius', 'Fahrenheit']
+            .map<DropdownMenuItem<String>>(
+              (value) => DropdownMenuItem<String>(
             value: value,
             child: Text(value),
-          );
-        }).toList(),
+          ),
+        )
+            .toList(),
       ),
     );
   }
@@ -104,25 +93,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _selectedLanguage = newValue!;
           });
         },
-        items: <String>['English', 'Spanish', 'French']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
+        items: ['English', 'Spanish', 'French']
+            .map<DropdownMenuItem<String>>(
+              (value) => DropdownMenuItem<String>(
             value: value,
             child: Text(value),
-          );
-        }).toList(),
+          ),
+        )
+            .toList(),
       ),
     );
   }
-
-  Widget _buildNotificationPreferences() {
-    return SwitchListTile(
-      title: Text('Enable Notifications'),
-      value: _isNotificationEnabled,
-      onChanged: _handleNotificationToggle,
-    );
-  }
-
   Widget _buildRefreshIntervalSelection() {
     return ListTile(
       title: Text('Data Refresh Interval'),
@@ -133,13 +114,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _selectedRefreshInterval = newValue!;
           });
         },
-        items: <String>['Every 15 minutes', 'Every 30 minutes', 'Every hour']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
+        items: ['Every 15 minutes', 'Every 30 minutes', 'Every hour']
+            .map<DropdownMenuItem<String>>(
+              (value) => DropdownMenuItem<String>(
             value: value,
             child: Text(value),
-          );
-        }).toList(),
+          ),
+        )
+            .toList(),
       ),
     );
   }
@@ -151,15 +133,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onChanged: (value) {
         setState(() {
           _isDarkThemeEnabled = value;
-          // Apply theme change logic here
-          if (_isDarkThemeEnabled) {
-            Provider.of<ThemeNotifier>(context, listen: false)
-                .setDarkTheme(true);
-          } else {
-            // Set the light theme
-            Provider.of<ThemeNotifier>(context, listen: false)
-                .setDarkTheme(false);
-          }
+          Provider.of<ThemeNotifier>(context, listen: false).setDarkTheme(value);
+        });
+      },
+    );
+  }
+
+  void _triggerSevereWeatherAlertNotification() {
+    notificationService.sendSevereWeatherAlertNotification();
+  }
+
+  Widget _buildNotificationPreferences() {
+    return SwitchListTile(
+      title: Text('Enable Notifications'),
+      value: _isNotificationEnabled,
+      onChanged: (value) {
+        setState(() {
+          _isNotificationEnabled = value;
+          if (value) _triggerSevereWeatherAlertNotification();
         });
       },
     );

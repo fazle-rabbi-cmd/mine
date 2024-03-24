@@ -41,6 +41,7 @@ dependencies:
   fl_chart: ^0.66.2
   cached_network_image: ^3.3.1
   flutter_svg: ^2.0.10+1
+  geocoding: ^3.0.0
 
 
 
