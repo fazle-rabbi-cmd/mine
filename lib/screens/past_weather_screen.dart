@@ -12,20 +12,12 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<void> fetchWeatherData(String location, String date) async {
     try {
       final data = await weatherService.getPastWeatherData(location, date);
-      setState(() {
-        weatherData = data;
-      });
-      print('fetched weather data: $weatherData');
+      setState(() => weatherData = data);
     } catch (e) {
-      print('Error fetching weather data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching weather data: $e')));
     }
   }
 
@@ -37,18 +29,14 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
       lastDate: DateTime.now(),
     );
     if (picked != null && picked != DateTime.now()) {
-      setState(() {
-        _dateController.text = picked.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
-      });
+      setState(() => _dateController.text = picked.toIso8601String().split('T')[0]);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Past Weather Data'),
-      ),
+      appBar: AppBar(title: Text('Past Weather Data')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -58,23 +46,19 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
               controller: _dateController,
               decoration: InputDecoration(
                 labelText: 'Enter Date (YYYY-MM-DD)',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(context),
-                ),
+                suffixIcon: IconButton(icon: Icon(Icons.calendar_today), onPressed: () => _selectDate(context)),
               ),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: _locationController,
-              decoration: InputDecoration(
-                labelText: 'Enter Location',
-              ),
-            ),
+            TextField(controller: _locationController, decoration: InputDecoration(labelText: 'Enter Location')),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                fetchWeatherData(_locationController.text, _dateController.text);
+                if (_locationController.text.isNotEmpty && _dateController.text.isNotEmpty) {
+                  fetchWeatherData(_locationController.text, _dateController.text);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter both location and date')));
+                }
               },
               child: Text('Search'),
             ),
@@ -100,19 +84,13 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
 
   List<Widget> _buildWeatherDataList(Map<String, dynamic> data) {
     final List<Widget> widgets = [];
-
-    // Extract city name and timezone from the top-level data
     final String cityName = data['city_name'] ?? 'Unknown City';
     final String timezone = data['timezone'] ?? 'Unknown Timezone';
-    widgets.add(Text('City: $cityName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)));
-    widgets.add(Text('Timezone: $timezone', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)));
-
-    // Extract and display items from the 'data' field
-    final List<dynamic> dataList = data['data'] ?? [];
-    dataList.forEach((item) {
-      widgets.add(_buildWeatherItemWidget(item));
-    });
-
+    widgets.addAll([
+      Text('City: $cityName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+      Text('Timezone: $timezone', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+      ...(data['data'] ?? []).map((item) => _buildWeatherItemWidget(item as Map<String, dynamic>)).toList(),
+    ]);
     return widgets;
   }
 
@@ -123,28 +101,16 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: item.entries.map((entry) {
-            final String label = _getLabel(entry.key);
-            final dynamic value = entry.value;
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                children: [
-                  Text(
-                    '$label:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      value.toString(),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
+          children: item.entries.map((entry) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: [
+                Text('${_getLabel(entry.key)}:', style: TextStyle(fontWeight: FontWeight.bold)),
+                SizedBox(width: 8),
+                Expanded(child: Text(entry.value.toString(), style: TextStyle(fontSize: 16))),
+              ],
+            ),
+          )).toList(),
         ),
       ),
     );
