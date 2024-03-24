@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mine/services/past_weather_service.dart'; // Adjust the import path as needed
+import '../services/past_weather_service.dart';
 
 class PastWeatherScreen extends StatefulWidget {
   @override
@@ -7,37 +7,24 @@ class PastWeatherScreen extends StatefulWidget {
 }
 
 class _PastWeatherScreenState extends State<PastWeatherScreen> {
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final PastWeatherService _pastWeatherService = PastWeatherService('aa05b3052bf24c11b0a9cd580d0ca631');
-
-  String _weatherData = '';
+  final WeatherService weatherService = WeatherService();
+  Map<String, dynamic> weatherData = {};
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _locationController = TextEditingController();
 
   @override
-  void dispose() {
-    _startDateController.dispose();
-    _endDateController.dispose();
-    _locationController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
   }
 
-  Future<void> _searchWeatherData() async {
-    final startDate = _startDateController.text;
-    final endDate = _endDateController.text;
-    final location = _locationController.text;
-
+  Future<void> fetchWeatherData(String location, String date) async {
     try {
-      final coordinates = await _pastWeatherService.getCoordinates(location);
-      final latitude = coordinates['latitude'];
-      final longitude = coordinates['longitude'];
-
-      final weatherData = await _pastWeatherService.getPastWeather(latitude!, longitude!, startDate, endDate);
+      final data = await weatherService.getPastWeatherData(location, date);
       setState(() {
-        _weatherData = weatherData;
+        weatherData = data;
       });
     } catch (e) {
-      print('Error fetching past weather data: $e');
+      print(e);
     }
   }
 
@@ -48,35 +35,35 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
         title: Text('Past Weather Data'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextFormField(
-              controller: _startDateController,
-              decoration: InputDecoration(labelText: 'Start Date (YYYY-MM-DD)'),
+            TextField(
+              controller: _dateController,
+              decoration: InputDecoration(
+                labelText: 'Enter Date (YYYY-MM-DD)',
+              ),
             ),
-            SizedBox(height: 16.0),
-            TextFormField(
-              controller: _endDateController,
-              decoration: InputDecoration(labelText: 'End Date (YYYY-MM-DD)'),
-            ),
-            SizedBox(height: 16.0),
-            TextFormField(
+            SizedBox(height: 20),
+            TextField(
               controller: _locationController,
-              decoration: InputDecoration(labelText: 'Location'),
+              decoration: InputDecoration(
+                labelText: 'Enter Location',
+              ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _searchWeatherData,
+              onPressed: () {
+                fetchWeatherData(_locationController.text, _dateController.text);
+              },
               child: Text('Search'),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  _weatherData,
-                  style: TextStyle(fontSize: 16.0),
+                  weatherData.isNotEmpty ? weatherData.toString() : 'No data available',
                 ),
               ),
             ),

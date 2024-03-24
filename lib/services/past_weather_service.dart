@@ -1,43 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class PastWeatherService {
-  static const String _baseUrl = 'https://api.weatherbit.io/v2.0/history/daily';
-  String _apiKey;
+class WeatherService {
+  final String apiKey = 'aa05b3052bf24c11b0a9cd580d0ca631'; // Replace with your Weatherbit API key
+  final String baseUrl = 'https://api.weatherbit.io/v2.0/history/daily';
 
-  PastWeatherService(this._apiKey);
+  Future<Map<String, dynamic>> getPastWeatherData(String city, String date) async {
+    final DateTime startDate = DateTime.parse(date);
+    final DateTime endDate = startDate.add(Duration(days: 1));
+    final String formattedStartDate = startDate.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
+    final String formattedEndDate = endDate.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
 
-  Future<Map<String, double>> getCoordinates(String locationName) async {
-    try {
-      final url = '$_baseUrl?key=$_apiKey&city=$locationName';
-      final response = await http.get(Uri.parse(url));
+    final response = await http.get(
+      Uri.parse('$baseUrl?city=$city&key=$apiKey&start_date=$formattedStartDate&end_date=$formattedEndDate'),
+    );
 
-      if (response.statusCode == 200) {
-        final decodedData = json.decode(response.body);
-        final data = decodedData['data'][0];
-        final latitude = data['lat'] as double;
-        final longitude = data['lon'] as double;
-        return {'latitude': latitude, 'longitude': longitude};
-      } else {
-        throw Exception('Failed to get coordinates. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to get coordinates: $e');
-    }
-  }
-
-  Future<String> getPastWeather(double latitude, double longitude, String startDate, String endDate) async {
-    try {
-      final url = '$_baseUrl?key=$_apiKey&lat=$latitude&lon=$longitude&start_date=$startDate&end_date=$endDate';
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        throw Exception('Failed to load past weather data. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to load past weather data: $e');
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load weather data. Status code: ${response.statusCode}. Response body: ${response.body}');
     }
   }
 }

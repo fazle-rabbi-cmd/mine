@@ -11,7 +11,6 @@ import 'package:mine/widgets/hourly_forecast_widget.dart';
 import 'package:mine/widgets/crop_suggestions_widget.dart';
 import 'package:mine/widgets/recommendation_widget.dart';
 
-import '../widgets/date_picker_dialogue.dart';
 import '../widgets/search_dialogue.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -65,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Nimbus', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(icon: Icon(Icons.search), onPressed: () => showSearchScreen(context)),
-          IconButton(icon: Icon(Icons.calendar_today), onPressed: () => _showDatePickerDialog(context)),
           IconButton(icon: Icon(Icons.info), onPressed: () => _showRecommendation(context)),
         ],
         backgroundColor: Colors.lightBlueAccent[200],
@@ -153,12 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-  }
-
-  void _showDatePickerDialog(BuildContext context) async {
-    showDatePickerDialog(context, (DateTime selectedDate) {
-      // fetchWeatherDataForDate(selectedDate);
-    });
   }
 
   void showSearchScreen(BuildContext context) async {
