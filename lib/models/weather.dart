@@ -50,7 +50,7 @@ class Weather {
       precipitationType: data['weather']['description'] ?? '',
       precipitationAmount: data['precip']?.toString() ?? '',
       windSpeed: data['wind_spd']?.toDouble() ?? 0.0,
-      windDirection: data['wind_cdir_full'] ?? '',
+      windDirection: data['wind_cdir'] ?? '',
       humidity: data['rh']?.toDouble() ?? 0.0,
       chanceOfRain: data['pop']?.toDouble() ?? 0.0,
       aqi: data['aqi']?.toDouble() ?? 0.0,

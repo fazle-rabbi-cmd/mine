@@ -29,6 +29,20 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
     }
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _dateController.text = picked.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +58,10 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
               controller: _dateController,
               decoration: InputDecoration(
                 labelText: 'Enter Date (YYYY-MM-DD)',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
               ),
             ),
             SizedBox(height: 20),
@@ -83,20 +101,13 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
   List<Widget> _buildWeatherDataList(Map<String, dynamic> data) {
     final List<Widget> widgets = [];
 
-    data.entries.forEach((entry) {
-      final String label = _getLabel(entry.key);
-      // Skip the 'data' field
-      if (entry.key != 'data') {
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            '$label: ${entry.value}',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ));
-      }
-    });
+    // Extract city name and timezone from the top-level data
+    final String cityName = data['city_name'] ?? 'Unknown City';
+    final String timezone = data['timezone'] ?? 'Unknown Timezone';
+    widgets.add(Text('City: $cityName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)));
+    widgets.add(Text('Timezone: $timezone', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)));
 
+    // Extract and display items from the 'data' field
     final List<dynamic> dataList = data['data'] ?? [];
     dataList.forEach((item) {
       widgets.add(_buildWeatherItemWidget(item));
@@ -105,40 +116,39 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
     return widgets;
   }
 
-
   Widget _buildWeatherItemWidget(Map<String, dynamic> item) {
-    final List<Widget> widgets = [];
-    item.entries.forEach((entry) {
-      final String label = _getLabel(entry.key);
-      final dynamic value = entry.value;
-      if (value != null && value != '') { // Check if value is not empty or null
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '$label:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: item.entries.map((entry) {
+            final String label = _getLabel(entry.key);
+            final dynamic value = entry.value;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Row(
+                children: [
+                  Text(
+                    '$label:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      value.toString(),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  value.toString(),
-                ),
-              ),
-            ],
-          ),
-        ));
-      }
-    });
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
-
 
   String _getLabel(String key) {
     // Mapping of keys to their corresponding labels
@@ -190,5 +200,4 @@ class _PastWeatherScreenState extends State<PastWeatherScreen> {
     };
     return labelMap[key] ?? key; // If key not found in map, use the original key
   }
-
 }
