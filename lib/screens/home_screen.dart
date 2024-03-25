@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(icon: Icon(Icons.search), onPressed: () => showSearchScreen(context)),
           IconButton(icon: Icon(Icons.info), onPressed: () => _showRecommendation(context)),
         ],
-        backgroundColor: Colors.lightBlueAccent[200],
+        backgroundColor: Colors.transparent, // Make AppBar transparent
         elevation: 0,
       ),
       drawer: _buildDrawer(),
@@ -81,7 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName),
+                  Card( // Wrap in Card
+                    child: CurrentWeatherWidget(currentWeather: currentWeather, locationName: locationName),
+                  ),
                   SizedBox(height: 20),
                   _buildButton('Crop Suggestions', showCropSuggestions, () => setState(() => showCropSuggestions = !showCropSuggestions)),
                   SizedBox(height: 10),
@@ -89,11 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 10),
                   _buildButton('Daily Forecast', showDailyForecast, () => setState(() => showDailyForecast = !showDailyForecast)),
                   SizedBox(height: 20),
-                  if (showCropSuggestions) CropSuggestionWidget(temperature: currentWeather.temperature),
+                  if (showCropSuggestions) Card( // Wrap in Card
+                    child: CropSuggestionWidget(temperature: currentWeather.temperature),
+                  ),
                   SizedBox(height: 20),
-                  if (showHourlyForecast) HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                  if (showHourlyForecast) Card( // Wrap in Card
+                    child: HourlyForecastWidget(hourlyForecast: hourlyForecast),
+                  ),
                   SizedBox(height: 20),
-                  if (showDailyForecast) DailyForecastWidget(dailyForecast: dailyForecast),
+                  if (showDailyForecast) Card( // Wrap in Card
+                    child: DailyForecastWidget(dailyForecast: dailyForecast),
+                  ),
                   SizedBox(height: 20),
                 ],
               ),
@@ -117,7 +126,13 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blueGrey[800]),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blueGrey, Colors.blueGrey],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
             child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
           ),
           _buildDrawerItem(Icons.history, 'Past Weather', () => _navigateTo(PastWeatherScreen())),
